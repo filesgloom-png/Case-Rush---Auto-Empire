@@ -26,6 +26,6 @@ test('Telegram viewport and safe areas are responsive', () => {
 test('launch documentation requires HTTPS and server-side validation', () => {
   assert.match(readme, /over HTTPS/i);
   assert.match(readme, /server only/i);
-  assert.match(readme, /No live HTTPS deployment/i);
+  assert.match(readme, /Live HTTPS deployment and BotFather configuration must be verified/i);
   assert.match(app, /initTelegramWebApp/);
 });
