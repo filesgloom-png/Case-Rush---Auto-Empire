@@ -1,11 +1,7 @@
 import './style.css';
+import { initTelegramWebApp } from './telegram';
 import { initialState, openCase, upgrade, race, safeLoad, type GameState, type Language } from './game';
 type Tab = 'garage' | 'cases' | 'races';
-declare global {
-  interface Window {
-    Telegram?: { WebApp?: { ready: () => void; expand: () => void; setHeaderColor?: (color: string) => void; setBackgroundColor?: (color: string) => void } };
-  }
-}
 const copy = {
   ru: {
     garage: 'Гараж', cases: 'Кейсы', races: 'Гонки', subtitle: 'Твоя коллекция. Твои правила.',
@@ -39,11 +35,7 @@ let tab: Tab = 'garage';
 let notice = '';
 let noticeKind: 'good' | 'bad' = 'good';
 const root = document.querySelector<HTMLDivElement>('#app')!;
-const tg = window.Telegram?.WebApp;
-tg?.ready();
-tg?.expand();
-tg?.setHeaderColor?.('#0b1017');
-tg?.setBackgroundColor?.('#0b1017');
+initTelegramWebApp();
 function save(): void { try { localStorage.setItem(key, JSON.stringify(state)); } catch { notice = 'Storage unavailable'; noticeKind = 'bad'; } }
 function carImage(id: string, extra = ''): string { return `<img class="car-image ${extra}" src="/cars/${id}.svg" alt="" draggable="false" />`; }
 function render(): void {

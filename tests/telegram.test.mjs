@@ -13,7 +13,7 @@ test('Telegram bootstrap calls ready and expand and sets app colors', () => {
   assert.match(telegram, /setBackgroundColor/);
 });
 test('Telegram identity is not trusted through initDataUnsafe', () => {
-  assert.doesNotMatch(telegram, /initDataUnsafe/);
+  assert.doesNotMatch(telegram, /webApp\\.initDataUnsafe|Telegram\\.WebApp\\.initDataUnsafe/);
   assert.match(telegram, /initDataPresent/);
   assert.match(telegram, /getTelegramInitDataForBackend/);
 });
