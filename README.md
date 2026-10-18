@@ -15,8 +15,10 @@ A Telegram Mini App prototype for collecting stylized cars, opening cases, upgra
 - `npm install`
 - `npm run dev`
 
-## CI
-GitHub Actions runs game logic tests, TypeScript checks and the Vite production build, then uploads `case-rush-web.zip`.
+## CI and HTTPS deployment
+GitHub Actions runs game logic tests, TypeScript checks and the Vite production build, then uploads `case-rush-web.zip`. A separate Pages workflow builds with the repository subpath and deploys the static app through GitHub Pages.
+
+Expected GitHub Pages URL (only after a successful deployment): `https://filesgloom-png.github.io/Case-Rush---Auto-Empire/`. This is a target URL, not a claim that the site is already live. GitHub Pages must be enabled for this repository with Settings → Pages → Build and deployment → Source set to GitHub Actions. That repository setting is outside the available read/write GitHub API actions in this session.
 
 ## Telegram launch preparation
 - The client calls the Telegram WebApp SDK's `ready()` and `expand()`, applies app colors, and tracks viewport/safe-area changes where the SDK exposes them.
@@ -25,4 +27,4 @@ GitHub Actions runs game logic tests, TypeScript checks and the Vite production 
 - Host the built `dist` contents on an HTTPS origin before configuring the URL in BotFather. A CI ZIP artifact is a build output, not a live hosted website.
 
 ## Current limitations
-This is a prototype, not a published Telegram bot. No live HTTPS deployment or BotFather configuration has been verified. There is no server-side Telegram initData verification, backend, cloud saves, player trading, PvP, or real-money purchases. LocalStorage progress is tied to the current browser/device and can be modified by the user; it must not be used as an authoritative economy source.
+This is a prototype, not a published Telegram bot. Live HTTPS deployment and BotFather configuration must be verified after the Pages workflow succeeds. There is no server-side Telegram initData verification, backend, cloud saves, player trading, PvP, or real-money purchases. LocalStorage progress is tied to the current browser/device and can be modified by the user; it must not be used as an authoritative economy source.
