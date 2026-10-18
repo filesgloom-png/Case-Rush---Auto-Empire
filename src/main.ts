@@ -1,31 +1,105 @@
 import './style.css';
 import { initialState, openCase, upgrade, race, safeLoad, type GameState, type Language } from './game';
 type Tab = 'garage' | 'cases' | 'races';
+declare global {
+  interface Window {
+    Telegram?: { WebApp?: { ready: () => void; expand: () => void; setHeaderColor?: (color: string) => void; setBackgroundColor?: (color: string) => void } };
+  }
+}
 const copy = {
-  ru: { garage: 'Гараж', cases: 'Кейсы', races: 'Гонки', subtitle: 'Твоя автомобильная империя начинается здесь', credits: 'Кредиты', level: 'Уровень', owned: 'В гараже', locked: 'Не получена', open: 'Открыть кейс · 250', upgrade: 'Улучшить двигатель · 300', race: 'Начать заезд', win: 'Победа!', loss: 'Поражение', insufficient: 'Недостаточно кредитов', history: 'Последние события', demo: 'Прототип · локальное сохранение', intro: 'Открывай кейсы, улучшай машины и выигрывай заезды.' },
-  uk: { garage: 'Гараж', cases: 'Кейси', races: 'Перегони', subtitle: 'Твоя автомобільна імперія починається тут', credits: 'Кредити', level: 'Рівень', owned: 'У гаражі', locked: 'Не отримано', open: 'Відкрити кейс · 250', upgrade: 'Покращити двигун · 300', race: 'Почати заїзд', win: 'Перемога!', loss: 'Поразка', insufficient: 'Недостатньо кредитів', history: 'Останні події', demo: 'Прототип · локальне збереження', intro: 'Відкривай кейси, покращуй машини та вигравай заїзди.' }
+  ru: {
+    garage: 'Гараж', cases: 'Кейсы', races: 'Гонки', subtitle: 'Твоя коллекция. Твои правила.',
+    credits: 'КРЕДИТЫ', level: 'УРОВЕНЬ', collection: 'Моя коллекция', owned: 'В гараже', locked: 'Не получена',
+    power: 'МОЩНОСТЬ', handling: 'УПРАВЛЯЕМОСТЬ', upgrade: 'Улучшить двигатель', cost: 'Стоимость', open: 'Открыть кейс',
+    streetCase: 'УЛИЧНЫЙ КЕЙС', odds: 'Шансы выпадения', common: 'Обычная', rare: 'Редкая', epic: 'Эпическая',
+    raceTitle: 'УЛИЧНЫЙ СПРИНТ', raceDesc: 'Заезд проходит автоматически. Подготовь машину и проверь свой рейтинг.',
+    startRace: 'Начать заезд', win: 'ПОБЕДА!', loss: 'В СЛЕДУЮЩИЙ РАЗ!', result: 'Результат заезда',
+    history: 'Последние события', empty: 'Пока тихо. Первый заезд уже ждёт.', insufficient: 'Недостаточно кредитов',
+    caseReceived: 'Новый автомобиль в коллекции!', duplicate: 'Повторная машина: начислена компенсация.',
+    upgraded: 'Двигатель улучшен: +10 мощности', demo: 'ПРОТОТИП · СОХРАНЕНИЕ НА ЭТОМ УСТРОЙСТВЕ',
+    intro: 'Открывай кейсы, собирай машины и выходи на старт.', raceReward: 'Награда за заезд начислена'
+  },
+  uk: {
+    garage: 'Гараж', cases: 'Кейси', races: 'Перегони', subtitle: 'Твоя колекція. Твої правила.',
+    credits: 'КРЕДИТИ', level: 'РІВЕНЬ', collection: 'Моя колекція', owned: 'У гаражі', locked: 'Не отримано',
+    power: 'ПОТУЖНІСТЬ', handling: 'КЕРОВАНІСТЬ', upgrade: 'Покращити двигун', cost: 'Вартість', open: 'Відкрити кейс',
+    streetCase: 'ВУЛИЧНИЙ КЕЙС', odds: 'Шанси випадіння', common: 'Звичайна', rare: 'Рідкісна', epic: 'Епічна',
+    raceTitle: 'ВУЛИЧНИЙ СПРИНТ', raceDesc: 'Перегони проходять автоматично. Підготуй авто та перевір свій рейтинг.',
+    startRace: 'Почати заїзд', win: 'ПЕРЕМОГА!', loss: 'НАСТУПНОГО РАЗУ!', result: 'Результат заїзду',
+    history: 'Останні події', empty: 'Поки тихо. Перший заїзд уже чекає.', insufficient: 'Недостатньо кредитів',
+    caseReceived: 'Нове авто в колекції!', duplicate: 'Повторне авто: нараховано компенсацію.',
+    upgraded: 'Двигун покращено: +10 потужності', demo: 'ПРОТОТИП · ЗБЕРЕЖЕННЯ НА ЦЬОМУ ПРИСТРОЇ',
+    intro: 'Відкривай кейси, збирай авто та виходь на старт.', raceReward: 'Нагороду за заїзд нараховано'
+  }
 };
 const key = 'case-rush-save-v1';
 let state: GameState;
 try { state = safeLoad(localStorage.getItem(key)); } catch { state = initialState(); }
 let tab: Tab = 'garage';
 let notice = '';
+let noticeKind: 'good' | 'bad' = 'good';
 const root = document.querySelector<HTMLDivElement>('#app')!;
-function save(): void { try { localStorage.setItem(key, JSON.stringify(state)); } catch { notice = 'Storage unavailable'; } }
+const tg = window.Telegram?.WebApp;
+tg?.ready();
+tg?.expand();
+tg?.setHeaderColor?.('#0b1017');
+tg?.setBackgroundColor?.('#0b1017');
+function save(): void { try { localStorage.setItem(key, JSON.stringify(state)); } catch { notice = 'Storage unavailable'; noticeKind = 'bad'; } }
+function carImage(id: string, extra = ''): string { return `<img class="car-image ${extra}" src="/cars/${id}.svg" alt="" draggable="false" />`; }
 function render(): void {
   const t = copy[state.language];
-  const selected = state.cars.find(car => car.id === state.selectedCarId)!;
-  root.innerHTML = `<main class="shell"><header class="header"><div class="brand"><span class="logo">CR</span><div><h1>CASE RUSH</h1><small>AUTO EMPIRE</small></div></div><button id="lang" class="lang" aria-label="Change language">${state.language.toUpperCase()} ▾</button></header>
-  <section class="hero"><div class="eyebrow">AUTO EMPIRE · SEASON 01</div><h2>${t.subtitle}</h2><p>${t.intro}</p><div class="metrics"><div><small>${t.credits}</small><strong>◈ ${state.credits.toLocaleString()}</strong></div><div><small>${t.level}</small><strong>${state.level}</strong></div></div></section>
-  <nav class="tabs" aria-label="Game navigation">${(['garage','cases','races'] as Tab[]).map(x => `<button data-tab="${x}" class="${tab===x?'active':''}">${t[x]}</button>`).join('')}</nav>
-  <section class="panel">${tab === 'garage' ? `<div class="section-title"><h3>${t.garage}</h3><span>${state.cars.filter(c=>c.owned).length}/${state.cars.length}</span></div><div class="car-art"><div class="glow"></div><div class="car-icon">🏎️</div><div class="model">${selected.name}</div><span class="tier">${selected.tier.toUpperCase()}</span></div><div class="stats"><span>POWER <b>${selected.power}</b></span><span>HANDLING <b>${selected.handling}</b></span></div><button id="upgrade" class="primary">${t.upgrade}</button><div class="collection">${state.cars.map(car=>`<button data-car="${car.id}" ${!car.owned?'disabled':''} class="car-card ${car.id===selected.id?'selected':''}"><span>🏎️</span><b>${car.name}</b><small>${car.owned?t.owned:t.locked}</small></button>`).join('')}</div>` : tab === 'cases' ? `<div class="section-title"><h3>${t.cases}</h3><span>STREET CASE</span></div><div class="case-art">◈<div class="case-label">STREET<br/>CASE</div></div><p class="hint">COMMON 70% · RARE 25% · EPIC 5%</p><button id="open" class="primary">${t.open}</button>` : `<div class="section-title"><h3>${t.races}</h3><span>STREET SPRINT</span></div><div class="track"><div class="road-line"></div><span class="race-car">🏎️</span><span class="finish">FINISH</span></div><p class="hint">${selected.name} · POWER ${selected.power}</p><button id="race" class="primary">${t.race}</button>`}</section>
-  ${notice?`<div class="notice" role="status">${notice}</div>`:''}<section class="events"><h3>${t.history}</h3><p>${state.history.slice(0,4).join(' · ') || '—'}</p></section><footer>${t.demo}</footer></main>`;
-  root.querySelector('#lang')?.addEventListener('click',()=>{state.language=(state.language==='ru'?'uk':'ru') as Language;notice='';save();render();});
-  root.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach(btn=>btn.addEventListener('click',()=>{tab=btn.dataset.tab as Tab;notice='';render();}));
-  root.querySelectorAll<HTMLButtonElement>('[data-car]').forEach(btn=>btn.addEventListener('click',()=>{state.selectedCarId=btn.dataset.car!;save();render();}));
-  root.querySelector('#open')?.addEventListener('click',()=>perform(()=>{state=openCase(state,Math.random());notice=state.history[0];}));
-  root.querySelector('#upgrade')?.addEventListener('click',()=>perform(()=>{state=upgrade(state);notice='+10 POWER';}));
-  root.querySelector('#race')?.addEventListener('click',()=>perform(()=>{const result=race(state,Math.random());state=result.state;notice=result.won?t.win:t.loss;}));
+  const selected = state.cars.find(car => car.id === state.selectedCarId && car.owned) ?? state.cars.find(car => car.owned)!;
+  const tabs: Tab[] = ['garage', 'cases', 'races'];
+  root.innerHTML = `<main class="app-shell">
+    <header class="topbar"><div class="brand"><span class="brand-mark">CR<span>↗</span></span><div><strong>CASE RUSH</strong><small>AUTO EMPIRE</small></div></div>
+      <button id="lang" class="lang-switch" aria-label="Change language">${state.language.toUpperCase()} <span>⌄</span></button>
+    </header>
+    <section class="welcome"><div><div class="eyebrow"><i></i> YOUR GARAGE · SEASON 01</div><h1>${t.subtitle}</h1><p>${t.intro}</p></div><div class="wallet"><small>${t.credits}</small><strong><span>◈</span> ${state.credits.toLocaleString()}</strong><small class="level-label">${t.level} <b>${state.level}</b></small></div></section>
+    <nav class="tabbar" aria-label="Game sections">${tabs.map(x => `<button data-tab="${x}" class="${tab === x ? 'active' : ''}"><span class="tab-icon">${x === 'garage' ? '▰' : x === 'cases' ? '▦' : '↗'}</span>${t[x]}</button>`).join('')}</nav>
+    <section class="screen">
+    ${tab === 'garage' ? `
+      <div class="section-head"><div><span class="eyebrow">01 / COLLECTION</span><h2>${t.collection}</h2></div><span class="count-pill">${state.cars.filter(car => car.owned).length.toString().padStart(2,'0')} <small>/ ${state.cars.length.toString().padStart(2,'0')}</small></span></div>
+      <article class="featured-car"><div class="car-backdrop"></div><div class="car-tag">${selected.tier.toUpperCase()} CLASS <span>•</span> #${selected.id.toUpperCase()}</div>${carImage(selected.id, 'featured-image')}<div class="car-info"><div><h3>${selected.name}</h3><p>STREET SERIES <span>·</span> MODEL 2026</p></div><span class="tier-dot ${selected.tier}"></span></div>
+        <div class="stat-grid"><div class="stat"><div><span>${t.power}</span><b>${selected.power}</b></div><div class="meter"><i style="width:${Math.min(100, selected.power / 3)}%"></i></div></div><div class="stat"><div><span>${t.handling}</span><b>${selected.handling}</b></div><div class="meter"><i style="width:${selected.handling}%"></i></div></div></div>
+        <button id="upgrade" class="primary-button"><span>＋</span><span>${t.upgrade}<small>${t.cost}: 300 ◈</small></span><b>↗</b></button>
+      </article>
+      <div class="section-head collection-head"><div><span class="eyebrow">YOUR LINEUP</span><h2>${t.collection}</h2></div></div>
+      <div class="car-grid">${state.cars.map(car => `<button data-car="${car.id}" ${!car.owned ? 'disabled' : ''} class="car-tile ${car.id === selected.id ? 'selected' : ''}">${carImage(car.id,'tile-image')}<span class="tile-tier ${car.tier}">${car.tier.toUpperCase()}</span><b>${car.name}</b><small>${car.owned ? t.owned : t.locked}</small></button>`).join('')}</div>`
+      : tab === 'cases' ? `
+      <div class="section-head"><div><span class="eyebrow">02 / DROP ZONE</span><h2>${t.cases}</h2></div><span class="count-pill">CASE <small>01</small></span></div>
+      <article class="case-panel"><div class="case-glow"></div><div class="case-label">${t.streetCase}</div><img class="case-image" src="/cars/street-case.svg" alt="Street case"/><div class="case-name">STREET <b>CASE</b></div><p>Three tiers. One new ride.</p><button id="open" class="primary-button"><span>✦</span><span>${t.open}<small>250 ◈</small></span><b>↗</b></button></article>
+      <div class="odds-card"><h3>${t.odds}</h3><div><span><i class="rarity common"></i>${t.common}</span><b>70%</b></div><div><span><i class="rarity rare"></i>${t.rare}</span><b>25%</b></div><div><span><i class="rarity epic"></i>${t.epic}</span><b>5%</b></div><small>Odds are shown before opening. Duplicate cars grant a credit compensation.</small></div>`
+      : `
+      <div class="section-head"><div><span class="eyebrow">03 / RACE CONTROL</span><h2>${t.races}</h2></div><span class="count-pill">SPRINT <small>01</small></span></div>
+      <article class="race-panel"><div class="race-top"><span class="eyebrow">NIGHT CIRCUIT</span><span class="live-dot">● READY</span></div><h3>${t.raceTitle}</h3><p>${t.raceDesc}</p><div class="race-track"><div class="track-glow"></div><div class="track-stripe"></div>${carImage(selected.id,'race-car player-car')}<img class="race-car rival-car" src="/cars/vortex.svg" alt="Rival car"/><span class="finish-line">FINISH</span></div><div class="race-stats"><span>YOUR CAR <b>${selected.name}</b></span><span>${t.power} <b>${selected.power}</b></span></div><button id="race" class="primary-button"><span>▶</span><span>${t.startRace}<small>REWARD UP TO 180 ◈ + XP</small></span><b>↗</b></button></article>`
+    }</section>
+    ${notice ? `<div class="notice ${noticeKind}" role="status">${notice}</div>` : ''}
+    <section class="history"><div class="history-head"><h3>${t.history}</h3><span>RECENT</span></div>${state.history.length ? state.history.slice(0,3).map((event,i) => `<div class="history-item"><span class="history-index">0${i+1}</span><span>${event}</span><i>↗</i></div>`).join('') : `<p class="empty-history">${t.empty}</p>`}</section>
+    <footer><span class="footer-mark">CR</span><span>${t.demo}</span></footer>
+  </main>`;
+  root.querySelector('#lang')?.addEventListener('click', () => { state.language = (state.language === 'ru' ? 'uk' : 'ru') as Language; notice = ''; save(); render(); });
+  root.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach(button => button.addEventListener('click', () => { tab = button.dataset.tab as Tab; notice = ''; render(); }));
+  root.querySelectorAll<HTMLButtonElement>('[data-car]').forEach(button => button.addEventListener('click', () => { state.selectedCarId = button.dataset.car!; notice = ''; save(); render(); }));
+  root.querySelector('#open')?.addEventListener('click', () => perform(() => {
+    const previous = state.cars.map(car => car.owned);
+    state = openCase(state, Math.random());
+    const prize = state.cars.find((car,i) => car.owned && !previous[i]);
+    notice = prize ? `${t.caseReceived} ${prize.name}` : t.duplicate;
+  }));
+  root.querySelector('#upgrade')?.addEventListener('click', () => perform(() => { state = upgrade(state); notice = t.upgraded; }));
+  root.querySelector('#race')?.addEventListener('click', () => perform(() => {
+    const result = race(state, Math.random());
+    state = result.state;
+    notice = result.won ? t.win : t.loss;
+    noticeKind = result.won ? 'good' : 'bad';
+  }));
 }
-function perform(action:()=>void):void { try { action();save(); } catch(e){ notice=e instanceof Error && e.message==='INSUFFICIENT_CREDITS'?copy[state.language].insufficient:'Error'; } render(); }
+function perform(action: () => void): void {
+  try { action(); save(); }
+  catch (error) {
+    notice = error instanceof Error && error.message === 'INSUFFICIENT_CREDITS' ? copy[state.language].insufficient : 'Action unavailable';
+    noticeKind = 'bad';
+  }
+  render();
+}
 render();
