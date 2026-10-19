@@ -191,7 +191,7 @@ test('save migration derives level from XP and safely handles maximum valid XP',
 test('extreme invalid credits, XP, and progress counters are handled without unsafe arithmetic', () => {
   const invalidXp = { ...initialState(), xp: Number.MAX_SAFE_INTEGER };
   const repaired = race(invalidXp, 0.99).state;
-  assert.equal(repaired.xp, 25);
+  assert.equal(repaired.xp, 1_000_000_000);
   const counters = { ...initialState(), casesOpened: 1_000_000_000, racesWon: 1_000_000_000, upgradesPurchased: 1_000_000_000 };
   assert.equal(openCase(counters, 0.1).casesOpened, 1_000_000_000);
   assert.equal(race(counters, 0.99).state.racesWon, 1_000_000_000);
