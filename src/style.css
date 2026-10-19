@@ -9,3 +9,28 @@ button, .car-tile { touch-action: manipulation; }
 
 /* Achievement progression */
 .achievements{margin:22px 1px 0}.achievement{display:flex;align-items:center;gap:11px;padding:12px;margin-top:8px;border:1px solid #293b45;border-radius:13px;background:linear-gradient(120deg,#17232d,#111921)}.achievement.unlocked{border-color:#347a67;background:linear-gradient(120deg,#183b34,#14232a)}.achievement-icon{display:grid;place-items:center;flex:0 0 37px;height:37px;border:1px solid #36514f;border-radius:11px;background:#1b3435;color:#75e7c7;font-size:17px}.achievement-copy{flex:1;min-width:0}.achievement-copy b,.achievement-copy small{display:block}.achievement-copy b{font-size:11px;color:#edf5f6}.achievement-copy small{font-size:9px;color:#8ca3ab;margin-top:4px}.achievement-meter{height:4px;background:#2a3943;border-radius:8px;overflow:hidden;margin-top:8px}.achievement-meter i{display:block;height:100%;background:linear-gradient(90deg,#31ad98,#7cf1cf);border-radius:8px}.achievement-progress{align-self:flex-start;color:#8cebd0;font-size:10px;font-weight:900;white-space:nowrap;padding-top:3px}
+
+/* Installable parts workbench */
+.parts-workbench{margin-top:14px;padding:13px;border:1px solid #2b454b;border-radius:15px;background:linear-gradient(145deg,#15242d,#101820)}
+.parts-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.parts-head h3{margin:0;font-size:13px;letter-spacing:.2px}
+.parts-head>span{font-size:8px;color:#7ce6c6;text-align:right}
+.part-slot{padding:10px 0;border-top:1px solid #ffffff0c}
+.part-slot-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:7px}
+.part-slot-head>b{font-size:10px;color:#dce9ed;white-space:nowrap}
+.part-slot-head>span{font-size:9px;line-height:1.45;color:#80b9a9;text-align:right}
+.part-options{display:flex;flex-wrap:wrap;gap:6px}
+.part-chip{border:1px solid #3a5059;border-radius:8px;padding:7px 8px;background:#1a2a34;color:#dce9ed;font-size:9px;text-align:left}
+.part-chip small{margin-left:4px;color:#8ca5ad}
+.part-chip.common{border-color:#607680}.part-chip.rare{border-color:#367cc2;color:#9dceff}.part-chip.epic{border-color:#8553b8;color:#dfb9ff}
+.part-empty{font-size:9px;color:#748e97;line-height:1.5}
+.case-panel .case-image{transform-origin:50% 62%}
+.case-panel.opening .case-image{animation:case-rush-shake .32s ease-in-out infinite alternate,case-rush-glow 1.1s ease-in-out infinite}
+.case-panel.opening .case-glow{animation:case-rush-pulse .45s ease-in-out infinite alternate;filter:blur(42px)}
+.case-panel.opening .case-name{color:#8af5d7;text-shadow:0 0 18px #61f0ccaa}
+.case-panel.opening{border-color:#68e8c6;box-shadow:0 0 35px #35d5a82b,inset 0 0 30px #35d5a812}
+.opening-label{color:#0c4236!important}
+@keyframes case-rush-shake{0%{transform:translateX(-3px) rotate(-2deg) scale(.98)}100%{transform:translateX(3px) rotate(2deg) scale(1.04)}}
+@keyframes case-rush-glow{0%,100%{filter:drop-shadow(0 8px 10px #0009)}50%{filter:drop-shadow(0 0 22px #71f5d5aa)}}
+@keyframes case-rush-pulse{from{opacity:.45;transform:translateX(-50%) scale(.9)}to{opacity:1;transform:translateX(-50%) scale(1.15)}}
+@media(prefers-reduced-motion:reduce){.case-panel.opening .case-image,.case-panel.opening .case-glow{animation:none}}
