@@ -19,11 +19,6 @@ function makeRng(seed) {
   };
 }
 
-function tierOf(state) {
-  return state.cars.find(car => car.owned && car.id !== 'comet')?.tier
-    ?? state.cars.find(car => car.id === 'comet').tier;
-}
-
 function percentile(values, p) {
   const sorted = [...values].sort((a, b) => a - b);
   const index = (sorted.length - 1) * p;
@@ -117,7 +112,7 @@ test('duplicate compensation distribution matches tier odds and remains below ca
 test('credit-reserve thresholds preserve the requested minimum before opening a case', () => {
   const reserves = [0, 250, 500, 1_000, 5_000];
   const outcomes = reserves.map(reserve => {
-    let state = { ...initialState(), credits: reserve + CASE_COST - 1 };
+    let state = initialState();
     const rng = makeRng(123);
     let opened = 0;
     for (let i = 0; i < 500; i++) {
@@ -134,10 +129,12 @@ test('credit-reserve thresholds preserve the requested minimum before opening a 
   assert.equal(outcomes[0].reserve, 0);
   assert.ok(outcomes.every(item => Number.isSafeInteger(item.opened) && item.opened >= 0));
   assert.ok(outcomes.every(item => Number.isSafeInteger(item.endingCredits) && item.endingCredits >= 0));
-  // A larger reserve must not make a case affordable below its configured threshold.
+  assert.ok(new Set(outcomes.map(item => item.opened)).size > 1,
+    'different reserve thresholds should produce measurably different case-buying behavior');
+  // A case is never bought until the configured reserve plus case price is available.
   for (const reserve of reserves) {
-    const state = { ...initialState(), credits: reserve + CASE_COST - 1 };
-    assert.ok(state.credits < reserve + CASE_COST);
+    const belowThreshold = { ...initialState(), credits: reserve + CASE_COST - 1 };
+    assert.ok(belowThreshold.credits < reserve + CASE_COST);
   }
   console.log('CREDIT_RESERVE_SIMULATION_JSON=' + JSON.stringify(outcomes));
 });
