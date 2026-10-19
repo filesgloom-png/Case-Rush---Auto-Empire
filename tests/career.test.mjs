@@ -114,3 +114,18 @@ test('career UI offers sprint and career, varied tracks and reduced-motion suppo
   assert.match(styles, /\.career-card\.racing \.player-car/);
   assert.match(styles, /prefers-reduced-motion:reduce/);
 });
+
+test('CASE RUSH signature styling keeps garage mods, cinematic feedback and reduced-motion support', () => {
+  const styles = readFileSync(new URL('../src/style.css', import.meta.url), 'utf8');
+  const app = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+  assert.match(styles, /CASE RUSH signature pass/);
+  assert.match(styles, /--rush-red:#ff6548/);
+  assert.match(styles, /--rush-lime:#d9ff68/);
+  assert.match(styles, /\.car-mods-overlay/);
+  assert.match(styles, /\.featured-image\.mod-engine/);
+  assert.match(styles, /\.case-sparks i/);
+  assert.match(styles, /\.career-card:before/);
+  assert.match(styles, /prefers-reduced-motion:reduce/);
+  assert.match(app, /installedModBadges\(selected\.id\)/);
+  assert.match(app, /case-sparks/);
+});
