@@ -74,8 +74,8 @@ test('legacy saves migrate with empty parts and installed slots; valid part prog
 test('case-opening animation is wired to the real open action and honors reduced motion', () => {
   const app = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
   const css = readFileSync(new URL('../src/style.css', import.meta.url), 'utf8');
-  assert.match(app, /classList\.add\('opening'\)/);
-  assert.match(app, /window\.setTimeout\(\(\) => perform/);
+  assert.match(app, /classList\.add\('opening', 'charging'\)/);
+  assert.match(app, /window\.setTimeout\(\(\) => \{/);\n  assert.match(app, /classList\.add\('surge'\)/);\n  assert.match(app, /classList\.add\('unlocking'\)/);\n  assert.match(app, /window\.setTimeout\(\(\) => perform/);
   assert.match(css, /@keyframes case-rush-shake/);
   assert.match(app, /case-sparks/);
   assert.match(app, /case-stage-mark/);
