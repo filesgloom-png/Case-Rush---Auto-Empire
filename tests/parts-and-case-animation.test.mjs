@@ -158,3 +158,36 @@ test('body paint customization preserves separate glass, wheel, lamp and accent 
     assert.match(svg, /class="body-shell"/);
   }
 });
+
+test('all car models expose brake hardware and distinct widebody and track kit silhouettes', () => {
+ const css=readFileSync(new URL('../src/style.css',import.meta.url),'utf8');
+ for(const model of ['comet','vortex','phantom']){
+  const svg=readFileSync(new URL('../src/cars/'+model+'.svg',import.meta.url),'utf8');
+  assert.equal((svg.match(/class="brake-upgrade"/g)||[]).length,2);
+  assert.equal((svg.match(/class="wheel-race-spokes"/g)||[]).length,2);
+  assert.match(svg,/class="wide-kit-detail"[\s\S]*?stroke-width="7"/);
+  assert.match(svg,/class="track-kit-detail"[\s\S]*?stroke-width="3"/);
+  assert.match(css,/\.car-image\.mod-tires \.brake-upgrade\{display:inline\}/);
+  assert.match(css,/\.car-image\.kit-wide \.wide-kit-detail\{[^}]*display:inline/);
+  assert.match(css,/\.car-image\.kit-track \.track-kit-detail\{[^}]*display:inline/);
+ }
+});
+test('SVG template IDs and local URL references stay isolated for simultaneous instances',()=>{
+ const app=readFileSync(new URL('../src/main.ts',import.meta.url),'utf8');
+ assert.match(app,/carSvgInstance/); assert.match(app,/new Map<string, string>\(\)/);
+ for(const model of ['comet','vortex','phantom']){
+  const source=readFileSync(new URL('../src/cars/'+model+'.svg',import.meta.url),'utf8');
+  const instances=[1,2].map(n=>{
+   const map=new Map();
+   let svg=source.replace(/id="([^"]+)"/g,(_m,id)=>{const v='cr'+n+'-'+id;map.set(id,v);return 'id="'+v+'"';});
+   svg=svg.replace(/url\(#([^)]+)\)/g,(_m,id)=>'url(#'+(map.get(id)||id)+')');
+   return svg;
+  });
+  const ids=instances.flatMap(s=>[...s.matchAll(/id="([^"]+)"/g)].map(m=>m[1]));
+  assert.equal(ids.length,new Set(ids).size);
+  for(const svg of instances){
+   const own=new Set([...svg.matchAll(/id="([^"]+)"/g)].map(m=>m[1]));
+   for(const ref of [...svg.matchAll(/url\(#([^)]+)\)/g)].map(m=>m[1])) assert.ok(own.has(ref));
+  }
+ }
+});

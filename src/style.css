@@ -145,17 +145,24 @@ button, .car-tile { touch-action: manipulation; }
 .car-image.body-violet{--paint-light:#F4DEFF;--paint-mid:#9B55C8;--paint-highlight:#D79AFF;--paint-shadow:#63338E;--paint-deep:#241033}
 .car-image.body-gold{--paint-light:#FFF2B7;--paint-mid:#D59A28;--paint-highlight:#FFE071;--paint-shadow:#885B14;--paint-deep:#33200A}
 .car-image.neon-mint{--neon-color:#63F0C5}.car-image.neon-blue{--neon-color:#63BAFF}.car-image.neon-pink{--neon-color:#FF70D2}.car-image.neon-amber{--neon-color:#FFCA69}
-.turbo-detail,.engine-detail,.ecu-detail,.wide-kit-detail,.track-kit-detail,.wheel-race-spokes{display:none}
-.car-image.mod-turbo .turbo-detail,.car-image.mod-engine .engine-detail,.car-image.mod-ecu .ecu-detail,.car-image.mod-tires .wheel-race-spokes{display:inline}
+.turbo-detail,.engine-detail,.ecu-detail,.wide-kit-detail,.track-kit-detail,.wheel-race-spokes,.brake-upgrade{display:none}
+.car-image.mod-turbo .turbo-detail,.car-image.mod-engine .engine-detail,.car-image.mod-ecu .ecu-detail,.car-image.mod-tires .wheel-race-spokes,.car-image.mod-tires .brake-upgrade{display:inline}
 .car-image.kit-wide .wide-kit-detail,.car-image.kit-track .track-kit-detail{display:inline}
 .car-image.mod-turbo .turbo-detail{filter:drop-shadow(0 0 4px #71DFFF)}
 .car-image.mod-engine .engine-detail{filter:drop-shadow(0 0 5px #65F0CB)}
 .car-image.mod-ecu .ecu-detail{filter:drop-shadow(0 0 6px var(--neon-color))}
-.car-image.mod-tires .wheel-race-spokes{filter:drop-shadow(0 0 3px #6DF2D0)}
-.car-image.kit-wide .wide-kit-detail{filter:drop-shadow(0 0 4px #F4D17C)}
-.car-image.kit-track .track-kit-detail{filter:drop-shadow(0 0 5px #77F5D2)}
+.car-image.mod-tires .wheel-race-spokes{filter:drop-shadow(0 0 3px #6DF2D0)}.car-image.mod-tires .brake-upgrade{filter:drop-shadow(0 0 2px #FF654F)}
+.car-image.kit-wide .wide-kit-detail{filter:drop-shadow(0 0 4px #F4D17C);display:inline}
+.car-image.kit-track .track-kit-detail{filter:drop-shadow(0 0 5px #77F5D2);display:inline}
 .car-image .neon-glow{stroke:var(--neon-color);opacity:.5;filter:blur(2px)}
 .featured-car:has(.neon-blue) .car-backdrop{background:radial-gradient(ellipse at 50% 62%,#2877c548,transparent 65%)}
 .featured-car:has(.neon-pink) .car-backdrop{background:radial-gradient(ellipse at 50% 62%,#c42a9648,transparent 65%)}
 .featured-car:has(.neon-amber) .car-backdrop{background:radial-gradient(ellipse at 50% 62%,#c78b2d48,transparent 65%)}
 @media(prefers-reduced-motion:reduce){.car-image{animation:none}}
+
+/* Distinct wheel hardware and kit silhouettes; paint remains isolated to body-shell */
+.car-image .wheel-rim{vector-effect:non-scaling-stroke}
+.car-image.mod-tires .wheel-race-spokes{stroke:#F2FBFF}
+.car-image.kit-wide .wide-kit-detail{stroke:#F4D17C;stroke-width:5}
+.car-image.kit-track .track-kit-detail{stroke:#77F5D2;stroke-width:3}
+@media(max-width:365px){.featured-image{max-width:100%;margin-left:0;margin-right:0}}
