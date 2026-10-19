@@ -142,7 +142,7 @@ export function safeLoad(raw: string | null): GameState {
         if (typeof id === 'string' && partCatalog.some(part => part.id === id && part.slot === slot)) installedParts[car.id][slot] = id;
       }
     }
-    const appearance = Object.fromEntries(starterCars.map(car => { const saved = s.appearance && typeof s.appearance === 'object' ? (s.appearance as Record<string, unknown>)[car.id] : null; const a = saved && typeof saved === 'object' ? saved as Record<string, unknown> : {}; const allowed = (v: unknown, list: string[], fallback: string) => typeof v === 'string' && list.includes(v) ? v : fallback; return [car.id, { body: allowed(a.body, ['factory','crimson','blue','violet','gold'], 'factory'), neon: allowed(a.neon, ['mint','blue','pink','amber'], 'mint'), bodyKit: allowed(a.bodyKit, ['street','wide','track'], 'street') }]; }));
+    const appearance = Object.fromEntries(starterCars.map(car => { const saved = s.appearance && typeof s.appearance === 'object' ? (s.appearance as Record<string, unknown>)[car.id] : null; const a = saved && typeof saved === 'object' ? saved as Record<string, unknown> : {}; const allowed = (v: unknown, list: string[], fallback: string) => typeof v === 'string' && list.includes(v) ? v : fallback; return [car.id, { body: allowed(a.body, ['factory','crimson','blue','violet','gold'], 'factory') as CarAppearance['body'], neon: allowed(a.neon, ['mint','blue','pink','amber'], 'mint') as CarAppearance['neon'], bodyKit: allowed(a.bodyKit, ['street','wide','track'], 'street') as CarAppearance['bodyKit'] }]; }));
     const level = 1 + Math.floor(xp / 100);
     return {
       appearance, credits: s.credits!, level, xp, language: s.language!, cars, selectedCarId,
