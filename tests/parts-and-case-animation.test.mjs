@@ -43,7 +43,7 @@ test('parts install into matching slots, alter race stats, and return replaced p
   assert.equal(state.parts['engine-common'], 1);
   assert.equal(state.parts['engine-rare'], 0);
   assert.equal(getCarStats(state, 'comet').power, 119);
-  assert.equal(race(state, 0).won, true);
+  assert.equal(race(state, 0.2).won, true);
 });
 
 test('cannot install unowned or mismatched parts and inventory never goes negative', () => {
