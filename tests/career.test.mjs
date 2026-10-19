@@ -148,7 +148,7 @@ test('installed tuning exposes part tier and stat gains while career goals expla
 test('case opening uses lightweight staged effects and disables them for reduced motion', () => {
   const styles = readFileSync(new URL('../src/style.css', import.meta.url), 'utf8');
   const app = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
-  assert.match(app, /panel\?\.classList\.add\('opening'\)/);
+  assert.match(app, /panel\?\.classList\.add\('opening', 'charging'\)/);
   assert.match(styles, /\.case-panel\.opening \.case-stage:before/);
   assert.match(styles, /\.case-panel\.opening \.case-stage:after/);
   assert.match(styles, /@keyframes case-core-expand/);
