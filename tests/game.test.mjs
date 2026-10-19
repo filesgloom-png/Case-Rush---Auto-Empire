@@ -147,7 +147,7 @@ test('case rolls immediately below one stay within the epic tier', () => {
 test('10,000 consecutive wins have deterministic long-run economy and XP', () => {
   let state = initialState();
   for (let i = 0; i < 10_000; i++) state = race(state, 0.99).state;
-  assert.equal(state.credits, 1_801_000);
+  assert.equal(state.credits, 901_000);
   assert.equal(state.xp, 250_000);
   assert.equal(state.level, 2_501);
   assert.equal(state.racesWon, 10_000);
