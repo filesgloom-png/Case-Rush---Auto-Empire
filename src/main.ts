@@ -59,7 +59,7 @@ function render(): void {
       <div class="car-grid">${state.cars.map(car => `<button data-car="${car.id}" ${!car.owned ? 'disabled' : ''} class="car-tile ${car.id === selected.id ? 'selected' : ''}">${carImage(car.id,'tile-image')}<span class="tile-tier ${car.tier}">${car.tier.toUpperCase()}</span><b>${car.name}</b><small>${car.owned ? t.owned : t.locked}</small></button>`).join('')}</div>`
       : tab === 'cases' ? `
       <div class="section-head"><div><span class="eyebrow">02 / DROP ZONE</span><h2>${t.cases}</h2></div><span class="count-pill">CASE <small>01</small></span></div>
-      <article class="case-panel"><div class="case-glow"></div><div class="case-label">${t.streetCase}</div><img class="case-image" src="${import.meta.env.BASE_URL}cars/street-case.svg" alt="Street case"/><div class="case-name">STREET <b>CASE</b></div><p>Cars, parts and duplicate compensation.</p><button id="open" class="primary-button"><span>✦</span><span>${t.open}<small>250 ◈</small></span><b>↗</b></button></article>
+      <article class="case-panel"><div class="case-glow"></div><div class="case-scanline"></div><div class="case-orbit orbit-one"></div><div class="case-orbit orbit-two"></div><div class="case-sparks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="case-label"><span class="live-dot">●</span> ${t.streetCase} <span class="case-season">SERIES 01</span></div><div class="case-stage"><div class="case-floor"></div><img class="case-image" src="${import.meta.env.BASE_URL}cars/street-case.svg" alt="Street case"/><span class="case-stage-mark">CR <b>01</b></span></div><div class="case-name">STREET <b>CASE</b></div><div class="case-subtitle">UNLOCK YOUR NEXT LEGEND</div><p>Cars, parts and duplicate compensation.</p><div class="case-reward-types"><span>▰ CAR DROP</span><span>⚙ PARTS</span><span>◈ BONUS</span></div><button id="open" class="primary-button"><span>✦</span><span>${t.open}<small>250 ◈</small></span><b>↗</b></button></article>
       <div class="odds-card"><h3>${t.odds}</h3><div><span><i class="rarity common"></i>${t.common}</span><b>70%</b></div><div><span><i class="rarity rare"></i>${t.rare}</span><b>25%</b></div><div><span><i class="rarity epic"></i>${t.epic}</span><b>5%</b></div><small>Each case keeps the existing car odds. 50% extra part drop chance; duplicate cars grant credit compensation.</small></div>`
       : `
       <div class="section-head"><div><span class="eyebrow">03 / RACE CONTROL</span><h2>${t.races}</h2></div><span class="count-pill">SPRINT <small>01</small></span></div>
@@ -95,7 +95,7 @@ function render(): void {
       const prize = state.cars.find((car, i) => car.owned && !previous[i]);
       notice = [prize ? `${t.caseReceived} ${prize.name}` : t.duplicate, part ? `${state.language === 'ru' ? 'ДЕТАЛЬ' : 'ДЕТАЛЬ'}: ${part.name[state.language]}` : ''].filter(Boolean).join(' · ');
       noticeKind = 'good';
-    }), 1350);
+    }), 1900);
   });
   root.querySelectorAll<HTMLButtonElement>('[data-install-part]').forEach(button => button.addEventListener('click', () => perform(() => {
     state = installPart(state, button.dataset.slot as PartSlot, button.dataset.installPart!);

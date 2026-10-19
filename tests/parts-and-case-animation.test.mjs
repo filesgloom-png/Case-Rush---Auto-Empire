@@ -77,6 +77,10 @@ test('case-opening animation is wired to the real open action and honors reduced
   assert.match(app, /classList\.add\('opening'\)/);
   assert.match(app, /window\.setTimeout\(\(\) => perform/);
   assert.match(css, /@keyframes case-rush-shake/);
+  assert.match(app, /case-sparks/);
+  assert.match(app, /case-stage-mark/);
+  assert.match(css, /@keyframes case-ring-spin/);
+  assert.match(css, /@keyframes car-showcase/);
   assert.match(css, /prefers-reduced-motion:reduce/);
   assert.match(app, /Установи 4 детали/);
   assert.match(app, /Встанови 4 деталі/);
