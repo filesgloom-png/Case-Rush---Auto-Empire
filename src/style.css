@@ -221,3 +221,108 @@ button, .car-tile { touch-action: manipulation; }
 .career-card.racing .player-car{animation:race-player-launch 2.65s cubic-bezier(.2,.68,.25,1) both}.career-card.racing .rival-car{animation:race-rival-launch 2.65s cubic-bezier(.3,.55,.35,1) both}.career-card.racing .track-stripe{animation:race-track-scroll .18s linear infinite}.career-card.racing .track-glow{animation:race-glow-surge .45s ease-in-out infinite alternate}.career-card.racing .speed-lines{opacity:1;animation:race-speed-lines .22s linear infinite}.career-card.racing .race-progress i{animation:race-progress-fill 2.65s linear both}.career-card.racing .race-finish-flash{animation:race-finish-flash .5s ease-out 2.3s both}.career-card.racing .race-lights i{animation:race-light-sequence .8s steps(1,end) both}
 @media(max-width:365px){.career-card{padding:13px}.career-card h3{font-size:20px}.career-goal-grid{gap:6px}.career-goal{padding:9px}}
 @media(prefers-reduced-motion:reduce){.career-card.racing .player-car,.career-card.racing .rival-car,.career-card.racing .track-stripe,.career-card.racing .track-glow,.career-card.racing .speed-lines,.career-card.racing .race-progress i,.career-card.racing .race-finish-flash,.career-card.racing .race-lights i{animation:none!important}.career-card.racing .race-progress i{width:100%}}
+
+
+/* CASE RUSH signature pass — redline orange, pit-lime and machined graphite. */
+:root{--rush-red:#ff6548;--rush-lime:#d9ff68;--rush-ice:#9bdcff;--rush-ink:#090d13;--rush-panel:#121923;--rush-line:#34404d}
+html,body{background-color:var(--rush-ink)}
+body{background-image:radial-gradient(ellipse at 84% 0%,#40231e 0%,transparent 35%),radial-gradient(ellipse at 8% 23%,#1b3040 0%,transparent 34%),linear-gradient(135deg,#090d13,#0c1119 58%,#10141a)}
+.app-shell{max-width:570px}
+.brand-mark{border-radius:11px 11px 11px 3px;border:1px solid #ff795c;background:linear-gradient(145deg,#3a201e,#131b25 72%);color:#ff795c;box-shadow:0 0 0 3px #ff65480d,0 8px 28px #ff65481c}
+.brand-mark span{color:var(--rush-lime)}
+.brand strong{letter-spacing:2.4px}
+.brand small{color:#9aa8b5;letter-spacing:3px}
+.welcome{position:relative;overflow:hidden;border-color:#6b423b;background:linear-gradient(112deg,#2b1d20 0%,#18232d 52%,#131923 100%);box-shadow:inset 0 1px #ffffff12,0 14px 34px #0003}
+.welcome:after{content:"CR / 01";position:absolute;right:-3px;bottom:-18px;color:#ffffff07;font-size:64px;font-weight:1000;font-style:italic;letter-spacing:-5px;pointer-events:none}
+.eyebrow{color:#ff9279}
+.eyebrow i{background:var(--rush-lime);box-shadow:0 0 8px #d9ff68}
+.welcome h1{letter-spacing:-1.1px}
+.wallet small{color:#a9b3bf}
+.wallet strong span{color:var(--rush-lime)}
+.tabbar button{border-color:#303b49;background:linear-gradient(145deg,#171f2a,#111720);transition:border-color .16s,background .16s,transform .16s}
+.tabbar button.active{background:linear-gradient(110deg,#ff7659,#ff563e);border-color:#ff9278;color:#210d0a;box-shadow:0 7px 22px #ff654827}
+.tabbar button:active,.primary-button:active{transform:translateY(1px)}
+.section-head h2{letter-spacing:-.7px}
+.count-pill{border-color:#66513a;background:#28231b;color:var(--rush-lime)}
+.featured-car,.case-panel,.race-panel{border-color:#374451;background:linear-gradient(145deg,#1a222d 0%,#111720 64%,#171b22 100%);box-shadow:0 14px 32px #0003,inset 0 1px #ffffff09}
+.featured-car:before{content:"";position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,transparent,#ff6548 18%,#d9ff68 52%,#9bdcff 83%,transparent);opacity:.9}
+.car-backdrop{inset:25px -15% 55px;background:radial-gradient(ellipse at 50% 65%,#ff654827,transparent 42%),radial-gradient(ellipse at 50% 73%,#9bdcff19,transparent 65%)}
+.car-tag{color:#b5c1cd}
+.car-tag span{color:var(--rush-red)}
+.featured-image{height:190px;filter:drop-shadow(0 17px 12px #000b) saturate(1.08)}
+.car-info{border-top-color:#ffffff15}
+.car-info h3{font-size:24px;letter-spacing:-.8px}
+.car-info p span{color:var(--rush-lime)}
+.tier-dot{width:9px;height:9px}
+.stat-grid{gap:12px}
+.stat{padding:11px;border:1px solid #303b49;border-radius:11px;background:linear-gradient(135deg,#1b2530,#121821)}
+.stat span{color:#a6b3c1}
+.meter{height:5px;background:#303b48}
+.meter i{background:linear-gradient(90deg,#ff6548,#d9ff68);box-shadow:0 0 10px #ff654844}
+.primary-button{border-color:#ff987f;background:linear-gradient(105deg,#ff785b,#ff5d43);color:#260e09;box-shadow:0 8px 23px #ff65481c}
+.primary-button small{color:#5b2015}
+.car-mods-overlay{top:76px;right:12px;gap:6px;max-width:48%}
+.mod-badge{border-color:#ff8a6a80;background:#15131bd9;color:#ffd0c4;box-shadow:0 3px 12px #0006;font-size:8px;letter-spacing:.9px}
+.mod-badge-turbo{border-color:#9bdcff;color:var(--rush-ice)}
+.mod-badge-tires{border-color:#d9ff68;color:var(--rush-lime)}
+.mod-badge-ecu{border-color:#c7a4ff;color:#d9c6ff}
+.parts-workbench{border-color:#354251;background:#0c121a}
+.parts-head h3{color:#f3f5f7}
+.part-slot{border-top-color:#ffffff12}
+.part-chip{border-color:#465361;background:#1a2430}
+.part-chip:active{border-color:var(--rush-lime)}
+.part-empty{color:#93a2b1}
+.customizer{border-color:#384351;background:linear-gradient(145deg,#171f29,#10151d)}
+.customizer-live{border-color:#6a5540;background:#29221b;color:var(--rush-lime)}
+.swatch.chosen,.neon-choice.chosen,.kit-choice.chosen{border-color:var(--rush-red);box-shadow:0 0 0 1px #ff65484a,0 0 17px #ff654817}
+.car-grid{gap:10px}
+.car-tile{border-color:#313d4b;background:linear-gradient(155deg,#1c2632,#111720);transition:transform .16s,border-color .16s,background .16s}
+.car-tile.selected{border-color:#ff795c;background:linear-gradient(155deg,#322225,#141a23);box-shadow:inset 0 0 0 1px #ff65482b,0 8px 18px #0002}
+.car-tile:active{transform:scale(.985)}
+.tile-tier.rare{color:var(--rush-ice)}
+.tile-tier.epic{color:#d5b0ff}
+.case-panel{background:radial-gradient(ellipse at 50% 38%,#3a2526,#171e28 52%,#10151d 82%)}
+.case-glow{background:#ff65483b}
+.case-label{color:#ff9a83}
+.case-season{border-color:#6c5145;color:var(--rush-lime)}
+.case-name b{color:var(--rush-red)}
+.case-subtitle{color:#d9ff68}
+.case-stage{border-color:#4a3940;background:linear-gradient(180deg,#202a36,#121821)}
+.case-floor{background:radial-gradient(ellipse,#ff65482c,transparent 68%)}
+.case-orbit{border-color:#ff78594a}
+.case-orbit.orbit-two{border-color:#d9ff6830}
+.case-scanline{opacity:.35}
+.case-sparks i{background:var(--rush-lime);box-shadow:0 0 8px #d9ff68}
+.odds-card{border-color:#354251;background:#121923}
+.odds-card>div{border-bottom-color:#ffffff10}
+.odds-card small{color:#9eabb8}
+.race-mode-switch button{border-color:#354251;background:linear-gradient(145deg,#1b2531,#111720)}
+.race-mode-switch button.active{background:linear-gradient(105deg,#ff785b,#ff5d43);border-color:#ff987f;color:#260e09;box-shadow:0 6px 20px #ff65481b}
+.career-card{border-color:#55413c;background:linear-gradient(145deg,#211e24,#141b25 62%,#11161e);box-shadow:0 12px 28px #0002,inset 0 1px #ffffff09}
+.career-card:before{content:"";position:absolute;top:0;left:17px;right:17px;height:2px;background:linear-gradient(90deg,var(--rush-red),var(--rush-lime),var(--rush-ice))}
+.career-stage-pill{border-color:#775342;color:#ffb09b;background:#2a201f}
+.career-goal{border-color:#394451;background:#111720}
+.career-goal>i{background:#303c49}
+.career-goal>i em{background:linear-gradient(90deg,#ff6548,#ffbd70)}
+.career-goal.goal-met>i em{background:linear-gradient(90deg,#9bcf54,#d9ff68)}
+.career-goal.goal-met{border-color:#637344}
+.career-goal.goal-missing{border-color:#71453f}
+.career-parts-row .part-ready{color:var(--rush-lime);border-color:#62753f;background:#252d1c}
+.career-parts-row .part-needed{color:#ffb5a5;border-color:#754840;background:#301d20}
+.career-opponent>b{color:var(--rush-lime)}
+.career-reward{border-color:#66563c;background:linear-gradient(110deg,#29251c,#1b2429)}
+.career-reward>b{color:var(--rush-lime)}
+.track-theme-industrial{background:linear-gradient(180deg,#342b28,#141b22)!important}
+.track-theme-desert{background:linear-gradient(180deg,#432b27,#1b2026)!important}
+.track-theme-skyline{background:linear-gradient(180deg,#182d46,#121922)!important}
+.track-theme-night{background:linear-gradient(180deg,#22212c,#111720)!important}
+.race-track{border-top-color:#ff654842;border-bottom-color:#ff654842}
+.track-stripe{border-color:#d9ff6855}
+.race-progress{background:#303b48}
+.race-progress i{background:linear-gradient(90deg,#ff6548,#d9ff68)}
+.race-finish-flash{background:#d9ff68}
+.notice.good{background:#202a1b;border-color:#63753d;color:#e4ffad}
+.notice.bad{background:#321e21;border-color:#81483f;color:#ffc1b3}
+.history-item{border-bottom-color:#ffffff12}
+@media(max-width:380px){.app-shell{padding-left:12px;padding-right:12px}.featured-image{height:170px}.car-mods-overlay{right:9px;top:72px}.mod-badge{font-size:7px;padding:4px 5px}.stat-grid{gap:7px}.stat{padding:9px}.car-grid{gap:7px}.car-tile{padding-left:6px;padding-right:6px}}
+@media(prefers-reduced-motion:reduce){.tabbar button,.car-tile,.primary-button{transition:none!important}}
