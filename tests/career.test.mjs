@@ -129,3 +129,29 @@ test('CASE RUSH signature styling keeps garage mods, cinematic feedback and redu
   assert.match(app, /installedModBadges\(selected\.id\)/);
   assert.match(app, /case-sparks/);
 });
+
+test('installed tuning exposes part tier and stat gains while career goals explain missing requirements', () => {
+  const app = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+  const styles = readFileSync(new URL('../src/style.css', import.meta.url), 'utf8');
+  assert.match(app, /mod-tier-\$\{part\.tier\}/);
+  assert.match(app, /part\.name\[state\.language\]/);
+  assert.match(app, /\+\$\{part\.power\} PWR \/ \+\$\{part\.handling\} GRIP/);
+  assert.match(app, /careerStage\.requiredPower - careerStats\.power/);
+  assert.match(app, /careerStage\.requiredHandling - careerStats\.handling/);
+  assert.match(app, /class="goal-gap"/);
+  assert.match(styles, /\.mod-badge\.mod-tier-epic/);
+  assert.match(styles, /\.goal-gap/);
+  assert.match(styles, /\.car-image\.mod-engine \.engine-detail/);
+  assert.match(styles, /\.car-image\.mod-tires \.wheel-race-spokes/);
+});
+
+test('case opening uses lightweight staged effects and disables them for reduced motion', () => {
+  const styles = readFileSync(new URL('../src/style.css', import.meta.url), 'utf8');
+  const app = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+  assert.match(app, /panel\?\.classList\.add\('opening'\)/);
+  assert.match(styles, /\.case-panel\.opening \.case-stage:before/);
+  assert.match(styles, /\.case-panel\.opening \.case-stage:after/);
+  assert.match(styles, /@keyframes case-core-expand/);
+  assert.match(styles, /@keyframes case-core-spin/);
+  assert.match(styles, /prefers-reduced-motion:reduce\)\{\.mod-badge/);
+});
