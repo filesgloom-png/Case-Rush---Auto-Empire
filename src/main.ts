@@ -13,7 +13,7 @@ const copy = {
     history: 'Последние события', empty: 'Пока тихо. Первый заезд уже ждёт.', insufficient: 'Недостаточно кредитов',
     caseReceived: 'Новый автомобиль в коллекции!', duplicate: 'Повторная машина: начислена компенсация.',
     upgraded: 'Двигатель улучшен: +10 мощности', demo: 'ПРОТОТИП · СОХРАНЕНИЕ НА ЭТОМ УСТРОЙСТВЕ',
-    intro: 'Открывай кейсы, собирай машины и выходи на старт.', raceReward: 'Награда за заезд начислена'
+    intro: 'Открывай кейсы, собирай машины и выходи на старт.', raceReward: 'Награда за заезд начислена', achievements: 'Достижения', achFirstCase: 'Первый дроп', achFirstCaseDesc: 'Открой первый кейс', achRaceWins: 'Гонщик', achRaceWinsDesc: 'Выиграй 5 заездов', achCollector: 'Коллекционер', achCollectorDesc: 'Собери все 3 машины', achTuner: 'Тюнер', achTunerDesc: 'Улучши двигатель 5 раз', completed: 'ВЫПОЛНЕНО', inProgress: 'В ПРОЦЕССЕ'
   },
   uk: {
     garage: 'Гараж', cases: 'Кейси', races: 'Перегони', subtitle: 'Твоя колекція. Твої правила.',
@@ -25,7 +25,7 @@ const copy = {
     history: 'Останні події', empty: 'Поки тихо. Перший заїзд уже чекає.', insufficient: 'Недостатньо кредитів',
     caseReceived: 'Нове авто в колекції!', duplicate: 'Повторне авто: нараховано компенсацію.',
     upgraded: 'Двигун покращено: +10 потужності', demo: 'ПРОТОТИП · ЗБЕРЕЖЕННЯ НА ЦЬОМУ ПРИСТРОЇ',
-    intro: 'Відкривай кейси, збирай авто та виходь на старт.', raceReward: 'Нагороду за заїзд нараховано'
+    intro: 'Відкривай кейси, збирай авто та виходь на старт.', raceReward: 'Нагороду за заїзд нараховано', achievements: 'Досягнення', achFirstCase: 'Перший дроп', achFirstCaseDesc: 'Відкрий перший кейс', achRaceWins: 'Гонщик', achRaceWinsDesc: 'Виграй 5 заїздів', achCollector: 'Колекціонер', achCollectorDesc: 'Збери всі 3 авто', achTuner: 'Тюнер', achTunerDesc: 'Покращ двигун 5 разів', completed: 'ВИКОНАНО', inProgress: 'У ПРОЦЕСІ'
   }
 };
 const key = 'case-rush-save-v1';
@@ -67,6 +67,14 @@ function render(): void {
     }</section>
     ${notice ? `<div class="notice ${noticeKind}" role="status">${notice}</div>` : ''}
     <section class="history"><div class="history-head"><h3>${t.history}</h3><span>RECENT</span></div>${state.history.length ? state.history.slice(0,3).map((event,i) => `<div class="history-item"><span class="history-index">0${i+1}</span><span>${event}</span><i>↗</i></div>`).join('') : `<p class="empty-history">${t.empty}</p>`}</section>
+    <section class="achievements"><div class="history-head"><h3>${t.achievements}</h3><span>${state.cars.filter(car => car.owned).length}/${state.cars.length} CARS</span></div>
+      ${[
+        { id: 'case', title: t.achFirstCase, desc: t.achFirstCaseDesc, progress: Math.min(state.casesOpened, 1), goal: 1, icon: '✦' },
+        { id: 'wins', title: t.achRaceWins, desc: t.achRaceWinsDesc, progress: Math.min(state.racesWon, 5), goal: 5, icon: '↗' },
+        { id: 'collector', title: t.achCollector, desc: t.achCollectorDesc, progress: state.cars.filter(car => car.owned).length, goal: state.cars.length, icon: '▰' },
+        { id: 'tuner', title: t.achTuner, desc: t.achTunerDesc, progress: Math.min(state.upgradesPurchased, 5), goal: 5, icon: '⚙' }
+      ].map(a => `<article class="achievement ${a.progress >= a.goal ? 'unlocked' : ''}"><span class="achievement-icon">${a.icon}</span><div class="achievement-copy"><b>${a.title}</b><small>${a.desc}</small><div class="achievement-meter"><i style="width:${Math.min(100, a.progress / a.goal * 100)}%"></i></div></div><span class="achievement-progress">${a.progress}/${a.goal}</span></article>`).join('')}
+    </section>
     <footer><span class="footer-mark">CR</span><span>${t.demo}</span></footer>
   </main>`;
   root.querySelector('#lang')?.addEventListener('click', () => { state.language = (state.language === 'ru' ? 'uk' : 'ru') as Language; notice = ''; save(); render(); });

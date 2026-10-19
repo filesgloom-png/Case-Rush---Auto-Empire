@@ -1,6 +1,6 @@
 export type Language = 'ru' | 'uk';
 export type Car = { id: string; name: string; tier: 'common' | 'rare' | 'epic'; power: number; handling: number; owned: boolean };
-export type GameState = { credits: number; level: number; xp: number; language: Language; cars: Car[]; selectedCarId: string; history: string[] };
+export type GameState = { credits: number; level: number; xp: number; language: Language; cars: Car[]; selectedCarId: string; history: string[]; casesOpened: number; racesWon: number; upgradesPurchased: number };
 export const CASE_COST = 250;
 export const UPGRADE_COST = 300;
 export const starterCars: Car[] = [
@@ -9,7 +9,7 @@ export const starterCars: Car[] = [
   { id: 'phantom', name: 'Phantom XR', tier: 'epic', power: 230, handling: 82, owned: false }
 ];
 export function initialState(): GameState {
-  return { credits: 1000, level: 1, xp: 0, language: 'ru', cars: starterCars.map(car => ({ ...car })), selectedCarId: 'comet', history: [] };
+  return { credits: 1000, level: 1, xp: 0, language: 'ru', cars: starterCars.map(car => ({ ...car })), selectedCarId: 'comet', history: [], casesOpened: 0, racesWon: 0, upgradesPurchased: 0 };
 }
 export function openCase(state: GameState, roll: number): GameState {
   if (state.credits < CASE_COST) throw new Error('INSUFFICIENT_CREDITS');
@@ -22,7 +22,8 @@ export function openCase(state: GameState, roll: number): GameState {
     ...state,
     credits: state.credits - CASE_COST + refund,
     cars: state.cars.map(car => car.id === prize.id ? { ...car, owned: true } : car),
-    history: [prize.name + (owned ? ' (+credits)' : ''), ...state.history].slice(0, 20)
+    history: [prize.name + (owned ? ' (+credits)' : ''), ...state.history].slice(0, 20),
+    casesOpened: (Number.isSafeInteger(state.casesOpened) && state.casesOpened >= 0 ? state.casesOpened : 0) + 1
   };
 }
 export function upgrade(state: GameState): GameState {
@@ -33,7 +34,8 @@ export function upgrade(state: GameState): GameState {
   return {
     ...state,
     credits: state.credits - UPGRADE_COST,
-    cars: state.cars.map(car => car.id === selected.id ? { ...car, power: car.power + 10 } : car)
+    cars: state.cars.map(car => car.id === selected.id ? { ...car, power: car.power + 10 } : car),
+    upgradesPurchased: (Number.isSafeInteger(state.upgradesPurchased) && state.upgradesPurchased >= 0 ? state.upgradesPurchased : 0) + 1
   };
 }
 export function race(state: GameState, roll: number): { state: GameState; won: boolean } {
@@ -42,7 +44,7 @@ export function race(state: GameState, roll: number): { state: GameState; won: b
   if (!car) throw new Error('NO_CAR');
   const won = car.power + car.handling * 0.4 + roll * 60 >= 155;
   const xp = state.xp + (won ? 25 : 10);
-  return { won, state: { ...state, credits: state.credits + (won ? 180 : 50), level: 1 + Math.floor(xp / 100), xp, history: [(won ? 'WIN ' : 'LOSS ') + car.name, ...state.history].slice(0, 20) } };
+  return { won, state: { ...state, credits: state.credits + (won ? 180 : 50), level: 1 + Math.floor(xp / 100), xp, history: [(won ? 'WIN ' : 'LOSS ') + car.name, ...state.history].slice(0, 20), racesWon: (Number.isSafeInteger(state.racesWon) && state.racesWon >= 0 ? state.racesWon : 0) + (won ? 1 : 0) } };
 }
 export function safeLoad(raw: string | null): GameState {
   if (!raw) return initialState();
@@ -66,7 +68,10 @@ export function safeLoad(raw: string | null): GameState {
       language: s.language!,
       cars,
       selectedCarId,
-      history: s.history.filter((item): item is string => typeof item === 'string').slice(0, 20)
+      history: s.history.filter((item): item is string => typeof item === 'string').slice(0, 20),
+      casesOpened: Number.isSafeInteger(s.casesOpened) && s.casesOpened! >= 0 && s.casesOpened! <= 1000000000 ? s.casesOpened! : 0,
+      racesWon: Number.isSafeInteger(s.racesWon) && s.racesWon! >= 0 && s.racesWon! <= 1000000000 ? s.racesWon! : 0,
+      upgradesPurchased: Number.isSafeInteger(s.upgradesPurchased) && s.upgradesPurchased! >= 0 && s.upgradesPurchased! <= 1000000000 ? s.upgradesPurchased! : 0
     };
   } catch {
     return initialState();

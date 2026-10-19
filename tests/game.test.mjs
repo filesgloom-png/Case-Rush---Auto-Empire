@@ -88,3 +88,28 @@ test('history is filtered and limited to twenty entries', () => {
   assert.equal(loaded.history.length, 15);
   assert.ok(loaded.history.every(x => typeof x === 'string'));
 });
+
+
+test('progress counters increment only for successful gameplay actions', () => {
+  const start = initialState();
+  const opened = openCase(start, 0.7);
+  assert.equal(opened.casesOpened, 1);
+  assert.equal(start.casesOpened, 0);
+  const tuned = upgrade(start);
+  assert.equal(tuned.upgradesPurchased, 1);
+  assert.equal(start.upgradesPurchased, 0);
+  assert.equal(race(start, 0.99).state.racesWon, 1);
+  assert.equal(race(start, 0).state.racesWon, 0);
+});
+test('legacy saves migrate progress counters safely and corrupted counters are clamped', () => {
+  const legacy = initialState();
+  delete legacy.casesOpened; delete legacy.racesWon; delete legacy.upgradesPurchased;
+  const migrated = safeLoad(JSON.stringify(legacy));
+  assert.equal(migrated.casesOpened, 0);
+  assert.equal(migrated.racesWon, 0);
+  assert.equal(migrated.upgradesPurchased, 0);
+  const bad = safeLoad(JSON.stringify({ ...initialState(), casesOpened: -4, racesWon: 'many', upgradesPurchased: 1e99 }));
+  assert.equal(bad.casesOpened, 0);
+  assert.equal(bad.racesWon, 0);
+  assert.equal(bad.upgradesPurchased, 0);
+});
