@@ -142,3 +142,58 @@ test('case rolls immediately below one stay within the epic tier', () => {
   assert.equal(result.cars.find(c => c.id === 'phantom').owned, true);
   assert.equal(result.casesOpened, 1);
 });
+
+
+test('10,000 consecutive wins have deterministic long-run economy and XP', () => {
+  let state = initialState();
+  for (let i = 0; i < 10_000; i++) state = race(state, 0.99).state;
+  assert.equal(state.credits, 1_801_000);
+  assert.equal(state.xp, 250_000);
+  assert.equal(state.level, 2_501);
+  assert.equal(state.racesWon, 10_000);
+});
+test('race probability follows power thresholds without changing reward values', () => {
+  const start = initialState();
+  assert.equal(race(start, 0.39).won, false);
+  assert.equal(race(start, 0.4).won, true);
+  const oneUpgrade = upgrade(start);
+  assert.equal(race(oneUpgrade, 0.22).won, false);
+  assert.equal(race(oneUpgrade, 0.23).won, true);
+  const twoUpgrades = upgrade(oneUpgrade);
+  assert.equal(race(twoUpgrades, 0.05).won, false);
+  assert.equal(race(twoUpgrades, 0.06).won, true);
+  const threeUpgrades = upgrade(twoUpgrades);
+  assert.equal(race(threeUpgrades, 0).won, true);
+});
+test('upgrade boundary rejects non-safe or over-limit power and stops at 10,000', () => {
+  const atLimit = { ...initialState(), cars: initialState().cars.map(c => c.id === 'comet' ? { ...c, power: 9990 } : c) };
+  assert.equal(upgrade(atLimit).cars.find(c => c.id === 'comet').power, 10000);
+  assert.throws(() => upgrade({ ...atLimit, cars: atLimit.cars.map(c => c.id === 'comet' ? { ...c, power: 10000 } : c) }), /MAX_UPGRADE/);
+  assert.throws(() => upgrade({ ...atLimit, cars: atLimit.cars.map(c => c.id === 'comet' ? { ...c, power: Number.MAX_SAFE_INTEGER } : c) }), /MAX_UPGRADE/);
+});
+test('race credits saturate safely and XP never exceeds the supported save limit', () => {
+  const rich = { ...initialState(), credits: Number.MAX_SAFE_INTEGER - 10 };
+  assert.equal(race(rich, 0.99).state.credits, Number.MAX_SAFE_INTEGER);
+  const maxXp = { ...initialState(), xp: 1_000_000_000, level: 10_000_001 };
+  const result = race(maxXp, 0.99).state;
+  assert.equal(result.xp, 1_000_000_000);
+  assert.equal(result.level, 10_000_001);
+});
+test('save migration derives level from XP and safely handles maximum valid XP', () => {
+  const legacy = { ...initialState(), xp: 999_999, level: 2 };
+  const loaded = safeLoad(JSON.stringify(legacy));
+  assert.equal(loaded.xp, 999_999);
+  assert.equal(loaded.level, 10_000);
+  const maximum = safeLoad(JSON.stringify({ ...initialState(), xp: 1_000_000_000, level: 100_000 }));
+  assert.equal(maximum.xp, 1_000_000_000);
+  assert.equal(maximum.level, 10_000_001);
+});
+test('extreme invalid credits, XP, and progress counters are handled without unsafe arithmetic', () => {
+  const invalidXp = { ...initialState(), xp: Number.MAX_SAFE_INTEGER };
+  const repaired = race(invalidXp, 0.99).state;
+  assert.equal(repaired.xp, 25);
+  const counters = { ...initialState(), casesOpened: 1_000_000_000, racesWon: 1_000_000_000, upgradesPurchased: 1_000_000_000 };
+  assert.equal(openCase(counters, 0.1).casesOpened, 1_000_000_000);
+  assert.equal(race(counters, 0.99).state.racesWon, 1_000_000_000);
+  assert.equal(upgrade(counters).upgradesPurchased, 1_000_000_000);
+});
