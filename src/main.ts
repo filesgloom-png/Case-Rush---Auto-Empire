@@ -45,7 +45,11 @@ function save(): void { try { localStorage.setItem(key, JSON.stringify(state)); 
 const carSvgSources: Record<string, string> = { comet: cometSvg, vortex: vortexSvg, phantom: phantomSvg };
 let carSvgInstance = 0;
 function carImage(id: string, extra = ''): string {
-  const mods = Object.entries(state.installedParts?.[id] ?? {}).map(([slot]) => `mod-${slot}`).join(' ');
+  const installed = state.installedParts?.[id] ?? {};
+  const mods = Object.entries(installed).flatMap(([slot, partId]) => {
+    const part = partCatalog.find(item => item.id === partId && item.slot === slot);
+    return part ? [`mod-${slot}`, `mod-${slot}-tier-${part.tier}`] : [];
+  }).join(' ');
   const a = state.appearance?.[id] ?? { body: 'factory', neon: 'mint', bodyKit: 'street' };
   const prefix = `cr${++carSvgInstance}`;
   const ids = new Map<string, string>();
@@ -124,8 +128,21 @@ function render(): void {
     const panel = root.querySelector<HTMLElement>('.case-panel');
     if (!button || button.disabled) return;
     button.disabled = true;
-    panel?.classList.add('opening');
-    button.querySelector('span:nth-child(2)')?.insertAdjacentHTML('beforeend', `<small class="opening-label">${state.language === 'ru' ? 'ОТКРЫВАЕМ…' : 'ВІДКРИВАЄМО…'}</small>`);
+    button.setAttribute('aria-busy', 'true');
+    panel?.classList.add('opening', 'charging');
+    button.querySelector('span:nth-child(2)')?.insertAdjacentHTML('beforeend', `<small class="opening-label">${state.language === 'ru' ? 'ЗАРЯД ЯЧЕЙКИ…' : 'ЗАРЯД КОМІРКИ…'}</small>`);
+    window.setTimeout(() => {
+      panel?.classList.remove('charging');
+      panel?.classList.add('surge');
+      const label = button.querySelector<HTMLElement>('.opening-label');
+      if (label) label.textContent = state.language === 'ru' ? 'СИНХРОНИЗАЦИЯ ДРОПА…' : 'СИНХРОНІЗАЦІЯ ДРОПУ…';
+    }, 520);
+    window.setTimeout(() => {
+      panel?.classList.remove('surge');
+      panel?.classList.add('unlocking');
+      const label = button.querySelector<HTMLElement>('.opening-label');
+      if (label) label.textContent = state.language === 'ru' ? 'РАЗБЛОКИРОВКА…' : 'РОЗБЛОКУВАННЯ…';
+    }, 1120);
     window.setTimeout(() => perform(() => {
       const previous = state.cars.map(car => car.owned);
       const carRoll = Math.random(); const partChanceRoll = Math.random(); const partTierRoll = Math.random(); const partSlotRoll = Math.random();
