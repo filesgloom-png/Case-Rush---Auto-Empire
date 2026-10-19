@@ -145,7 +145,6 @@ button, .car-tile { touch-action: manipulation; }
 .car-image.body-violet{--paint-light:#F4DEFF;--paint-mid:#9B55C8;--paint-highlight:#D79AFF;--paint-shadow:#63338E;--paint-deep:#241033}
 .car-image.body-gold{--paint-light:#FFF2B7;--paint-mid:#D59A28;--paint-highlight:#FFE071;--paint-shadow:#885B14;--paint-deep:#33200A}
 .car-image.neon-mint{--neon-color:#63F0C5}.car-image.neon-blue{--neon-color:#63BAFF}.car-image.neon-pink{--neon-color:#FF70D2}.car-image.neon-amber{--neon-color:#FFCA69}
-.body-shell{fill:url(#paint)!important}
 .turbo-detail,.engine-detail,.ecu-detail,.wide-kit-detail,.track-kit-detail,.wheel-race-spokes{display:none}
 .car-image.mod-turbo .turbo-detail,.car-image.mod-engine .engine-detail,.car-image.mod-ecu .ecu-detail,.car-image.mod-tires .wheel-race-spokes{display:inline}
 .car-image.kit-wide .wide-kit-detail,.car-image.kit-track .track-kit-detail{display:inline}
