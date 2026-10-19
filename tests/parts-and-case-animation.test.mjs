@@ -191,3 +191,18 @@ test('SVG template IDs and local URL references stay isolated for simultaneous i
   }
  }
 });
+
+test('night circuit has animated start lights, acceleration, progress, finish effects and installation feedback', () => {
+ const app = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+ const css = readFileSync(new URL('../src/style.css', import.meta.url), 'utf8');
+ assert.match(app, /race-lights/);
+ assert.match(app, /race-progress/);
+ assert.match(app, /panel.classList.add\('racing'\)/);
+ assert.match(app, /setTimeout\(\(\) => perform/);
+ assert.match(css, /@keyframes race-player-launch/);
+ assert.match(css, /@keyframes race-rival-launch/);
+ assert.match(css, /@keyframes race-progress-fill/);
+ assert.match(css, /@keyframes race-finish-flash/);
+ assert.match(css, /@media\(prefers-reduced-motion:reduce\)/);
+ assert.match(css, /part-install-pop/);
+});

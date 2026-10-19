@@ -54,9 +54,9 @@ test('race reward is deterministic for a fixed roll and never negative', () => {
   const loss = race(s, 0);
   const win = race(s, 0.99);
   assert.equal(loss.won, false);
-  assert.equal(loss.state.credits, s.credits + 50);
+  assert.equal(loss.state.credits, s.credits + 10);
   assert.equal(win.won, true);
-  assert.equal(win.state.credits, s.credits + 180);
+  assert.equal(win.state.credits, s.credits + 90);
   assert.equal(win.state.xp, 25);
 });
 test('race rejects invalid random values', () => {
@@ -152,7 +152,7 @@ test('10,000 consecutive wins have deterministic long-run economy and XP', () =>
   assert.equal(state.level, 2_501);
   assert.equal(state.racesWon, 10_000);
 });
-test('race probability follows power thresholds without changing reward values', () => {
+test('race probability follows power thresholds while reduced payouts stay independent of the roll', () => {
   const start = initialState();
   assert.equal(race(start, 0.39).won, false);
   assert.equal(race(start, 0.4).won, true);
@@ -196,4 +196,12 @@ test('extreme invalid credits, XP, and progress counters are handled without uns
   assert.equal(openCase(counters, 0.1).casesOpened, 1_000_000_000);
   assert.equal(race(counters, 0.99).state.racesWon, 1_000_000_000);
   assert.equal(upgrade(counters).upgradesPurchased, 1_000_000_000);
+});
+
+test('race payouts are deliberately modest compared with case and upgrade costs', () => {
+ const start = initialState();
+ assert.equal(race(start, 0.99).state.credits - start.credits, 90);
+ assert.equal(race(start, 0).state.credits - start.credits, 10);
+ assert.ok(90 < CASE_COST);
+ assert.ok(90 < UPGRADE_COST);
 });

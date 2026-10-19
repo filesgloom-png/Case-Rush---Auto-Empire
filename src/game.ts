@@ -112,7 +112,7 @@ export function race(state: GameState, roll: number): { state: GameState; won: b
   const currentCredits = Number.isSafeInteger(state.credits) && state.credits >= 0 ? state.credits : 0;
   const currentXp = Number.isSafeInteger(state.xp) && state.xp >= 0 ? Math.min(state.xp, MAX_XP) : 0;
   const xp = Math.min(MAX_XP, currentXp + (won ? 25 : 10));
-  return { won, state: { ...state, credits: Math.min(MAX_CREDITS, currentCredits + (won ? 180 : 50)), level: 1 + Math.floor(xp / 100), xp, history: [(won ? 'WIN ' : 'LOSS ') + car.name, ...state.history].slice(0, 20), racesWon: Math.min(MAX_PROGRESS_COUNTER, (Number.isSafeInteger(state.racesWon) && state.racesWon >= 0 ? state.racesWon : 0) + (won ? 1 : 0)) } };
+  return { won, state: { ...state, credits: Math.min(MAX_CREDITS, currentCredits + (won ? 90 : 10)), level: 1 + Math.floor(xp / 100), xp, history: [(won ? 'WIN ' : 'LOSS ') + car.name, ...state.history].slice(0, 20), racesWon: Math.min(MAX_PROGRESS_COUNTER, (Number.isSafeInteger(state.racesWon) && state.racesWon >= 0 ? state.racesWon : 0) + (won ? 1 : 0)) } };
 }
 export function safeLoad(raw: string | null): GameState {
   if (!raw) return initialState();

@@ -166,3 +166,32 @@ button, .car-tile { touch-action: manipulation; }
 .car-image.kit-wide .wide-kit-detail{stroke:#F4D17C;stroke-width:5}
 .car-image.kit-track .track-kit-detail{stroke:#77F5D2;stroke-width:3}
 @media(max-width:365px){.featured-image{max-width:100%;margin-left:0;margin-right:0}}
+
+/* Night Circuit: animated starting lights, acceleration, track motion and installation feedback */
+.race-panel{isolation:isolate}
+.race-lights{display:flex;align-items:center;gap:7px;margin:14px 0 -5px;padding:8px 10px;border:1px solid #2a414b;border-radius:9px;background:#0c141c}
+.race-lights span{flex:1;color:#8299a3;font-size:8px;font-weight:900;letter-spacing:1.1px}
+.race-lights i{display:block;width:11px;height:11px;border-radius:50%;background:#263b46;border:1px solid #49606a;box-shadow:inset 0 0 4px #0008}
+.race-progress{height:4px;margin:-2px 0 13px;background:#263741;border-radius:9px;overflow:hidden}
+.race-progress i{display:block;width:0;height:100%;border-radius:9px;background:linear-gradient(90deg,#5ce4bd,#f4d17c);box-shadow:0 0 12px #69e8c7}
+.speed-lines{position:absolute;inset:0;opacity:0;pointer-events:none;background:repeating-linear-gradient(170deg,transparent 0 23px,#d8fff61a 24px 26px,transparent 27px 45px)}
+.race-finish-flash{position:absolute;inset:0;opacity:0;pointer-events:none;background:linear-gradient(90deg,transparent,#dffffa55,transparent)}
+.race-panel.racing .live-dot{color:#ffe08a;animation:race-status-pulse .45s ease-in-out infinite alternate}
+.race-panel.racing .race-lights i{animation:race-light-sequence .8s steps(1,end) both}
+.race-panel.racing .race-lights i:nth-of-type(2){animation-delay:.35s}.race-panel.racing .race-lights i:nth-of-type(3){animation-delay:.7s}.race-panel.racing .race-lights i:nth-of-type(4){animation-delay:1.05s}
+.race-panel.racing .player-car{animation:race-player-launch 2.65s cubic-bezier(.2,.68,.25,1) both}
+.race-panel.racing .rival-car{animation:race-rival-launch 2.65s cubic-bezier(.3,.55,.35,1) both}
+.race-panel.racing .track-stripe{animation:race-track-scroll .18s linear infinite}.race-panel.racing .track-glow{animation:race-glow-surge .45s ease-in-out infinite alternate}
+.race-panel.racing .speed-lines{opacity:1;animation:race-speed-lines .22s linear infinite}.race-panel.racing .race-progress i{animation:race-progress-fill 2.65s linear both}
+.race-panel.racing .race-finish-flash{animation:race-finish-flash .5s ease-out 2.3s both}.race-panel.racing .race-track{box-shadow:inset 0 0 30px #62e8c72a}
+@keyframes race-status-pulse{from{opacity:.65}to{opacity:1;text-shadow:0 0 12px #ffe08a}}
+@keyframes race-light-sequence{0%,65%{background:#ff5555;border-color:#ff9696;box-shadow:0 0 13px #ff4545}66%,100%{background:#263b46;border-color:#49606a;box-shadow:none}}
+@keyframes race-player-launch{0%{transform:translateX(0) scale(1)}12%{transform:translateX(2%) scale(1.02)}35%{transform:translateX(19%) scale(1.04)}62%{transform:translateX(47%) scale(1.08)}83%{transform:translateX(74%) scale(1.12)}100%{transform:translateX(125%) scale(1.14);opacity:.2}}
+@keyframes race-rival-launch{0%{translate:0 0;opacity:.72}20%{translate:-5% 0;opacity:.9}52%{translate:-25% 0;opacity:1}78%{translate:-52% 0;opacity:.85}100%{translate:-110% 0;opacity:.15}}
+@keyframes race-track-scroll{to{transform:translateX(-45px)}}@keyframes race-glow-surge{from{opacity:.5;transform:scaleX(.8)}to{opacity:1;transform:scaleX(1.15)}}@keyframes race-speed-lines{to{background-position:0 90px}}
+@keyframes race-progress-fill{0%{width:0}25%{width:22%}55%{width:58%}80%{width:82%}100%{width:100%}}@keyframes race-finish-flash{0%{opacity:0;transform:translateX(-40%)}35%{opacity:1}100%{opacity:0;transform:translateX(40%)}}
+.featured-car.part-installing .featured-image{animation:part-install-pop .85s cubic-bezier(.2,.8,.25,1) both;filter:drop-shadow(0 0 18px #6cf0c9) drop-shadow(0 15px 13px #0009)}
+.featured-car.part-installing{border-color:#72f2d0;box-shadow:0 0 28px #51e4bd32,inset 0 0 24px #51e4bd10}.featured-car.part-installing .car-info{animation:part-info-flash .85s ease both}
+@keyframes part-install-pop{0%{transform:scale(.97);filter:brightness(.8)}35%{transform:scale(1.035);filter:brightness(1.45) drop-shadow(0 0 20px #6cf0c9)}65%{transform:scale(1.01);filter:brightness(1.15) drop-shadow(0 0 12px #6cf0c9)}100%{transform:scale(1);filter:drop-shadow(0 15px 13px #0009)}}
+@keyframes part-info-flash{0%,100%{border-color:#ffffff0e}40%{border-color:#6cf0c9;box-shadow:0 -4px 18px #6cf0c922}}
+@media(prefers-reduced-motion:reduce){.race-panel.racing .player-car,.race-panel.racing .rival-car,.race-panel.racing .track-stripe,.race-panel.racing .track-glow,.race-panel.racing .speed-lines,.race-panel.racing .race-progress i,.race-panel.racing .race-finish-flash,.race-panel.racing .race-lights i,.featured-car.part-installing .featured-image,.featured-car.part-installing .car-info{animation:none!important}.race-panel.racing .player-car{opacity:1;transform:none}.race-panel.racing .rival-car{opacity:.7}.race-panel.racing .race-progress i{width:100%}}

@@ -11,7 +11,7 @@ const copy = {
     credits: 'КРЕДИТЫ', level: 'УРОВЕНЬ', collection: 'Моя коллекция', owned: 'В гараже', locked: 'Не получена',
     power: 'МОЩНОСТЬ', handling: 'УПРАВЛЯЕМОСТЬ', upgrade: 'Улучшить двигатель', cost: 'Стоимость', open: 'Открыть кейс', parts: 'Мастерская деталей', partDrop: 'Шанс детали: 50%', engine: 'Двигатель', turbo: 'Турбина', tires: 'Шины', ecu: 'ЭБУ', emptySlot: 'Слот пуст', noParts: 'Нет деталей этого типа — открывай кейсы', powerShort: 'мощн.', handlingShort: 'упр.', installed: 'Деталь установлена',
     streetCase: 'УЛИЧНЫЙ КЕЙС', odds: 'Шансы выпадения', common: 'Обычная', rare: 'Редкая', epic: 'Эпическая',
-    raceTitle: 'УЛИЧНЫЙ СПРИНТ', raceDesc: 'Заезд проходит автоматически. Подготовь машину и проверь свой рейтинг.',
+    raceTitle: 'УЛИЧНЫЙ СПРИНТ', raceDesc: 'Подготовь сборку. Светофор погаснет — держись до финиша.', raceRewardLine: 'ПОБЕДА +90 ◈ · ПРОИГРЫШ +10 ◈ · XP', raceRunning: 'ЗАЕЗД ИДЁТ…', raceLights: 'ГОТОВЬСЯ К СТАРТУ',
     startRace: 'Начать заезд', win: 'ПОБЕДА!', loss: 'В СЛЕДУЮЩИЙ РАЗ!', result: 'Результат заезда',
     history: 'Последние события', empty: 'Пока тихо. Первый заезд уже ждёт.', insufficient: 'Недостаточно кредитов',
     caseReceived: 'Новый автомобиль в коллекции!', duplicate: 'Повторная машина: начислена компенсация.',
@@ -23,7 +23,7 @@ const copy = {
     credits: 'КРЕДИТИ', level: 'РІВЕНЬ', collection: 'Моя колекція', owned: 'У гаражі', locked: 'Не отримано',
     power: 'ПОТУЖНІСТЬ', handling: 'КЕРОВАНІСТЬ', upgrade: 'Покращити двигун', cost: 'Вартість', open: 'Відкрити кейс', parts: 'Майстерня деталей', partDrop: 'Шанс деталі: 50%', engine: 'Двигун', turbo: 'Турбіна', tires: 'Шини', ecu: 'ЕБУ', emptySlot: 'Слот порожній', noParts: 'Немає деталей цього типу — відкривай кейси', powerShort: 'потужн.', handlingShort: 'кер.', installed: 'Деталь встановлено',
     streetCase: 'ВУЛИЧНИЙ КЕЙС', odds: 'Шанси випадіння', common: 'Звичайна', rare: 'Рідкісна', epic: 'Епічна',
-    raceTitle: 'ВУЛИЧНИЙ СПРИНТ', raceDesc: 'Перегони проходять автоматично. Підготуй авто та перевір свій рейтинг.',
+    raceTitle: 'ВУЛИЧНИЙ СПРИНТ', raceDesc: 'Підготуй збірку. Світлофор згасне — тримайся до фінішу.', raceRewardLine: 'ПЕРЕМОГА +90 ◈ · ПОРАЗКА +10 ◈ · XP', raceRunning: 'ЗАЇЗД ТРИВАЄ…', raceLights: 'ГОТУЙСЯ ДО СТАРТУ',
     startRace: 'Почати заїзд', win: 'ПЕРЕМОГА!', loss: 'НАСТУПНОГО РАЗУ!', result: 'Результат заїзду',
     history: 'Останні події', empty: 'Поки тихо. Перший заїзд уже чекає.', insufficient: 'Недостатньо кредитів',
     caseReceived: 'Нове авто в колекції!', duplicate: 'Повторне авто: нараховано компенсацію.',
@@ -87,7 +87,7 @@ function render(): void {
       <div class="odds-card"><h3>${t.odds}</h3><div><span><i class="rarity common"></i>${t.common}</span><b>70%</b></div><div><span><i class="rarity rare"></i>${t.rare}</span><b>25%</b></div><div><span><i class="rarity epic"></i>${t.epic}</span><b>5%</b></div><small>Each case keeps the existing car odds. 50% extra part drop chance; duplicate cars grant credit compensation.</small></div>`
       : `
       <div class="section-head"><div><span class="eyebrow">03 / RACE CONTROL</span><h2>${t.races}</h2></div><span class="count-pill">SPRINT <small>01</small></span></div>
-      <article class="race-panel"><div class="race-top"><span class="eyebrow">NIGHT CIRCUIT</span><span class="live-dot">● READY</span></div><h3>${t.raceTitle}</h3><p>${t.raceDesc}</p><div class="race-track"><div class="track-glow"></div><div class="track-stripe"></div>${carImage(selected.id,'race-car player-car')}<img class="race-car rival-car" src="${import.meta.env.BASE_URL}cars/vortex.svg" alt="Rival car"/><span class="finish-line">FINISH</span></div><div class="race-stats"><span>YOUR CAR <b>${selected.name}</b></span><span>${t.power} <b>${getCarStats(state, selected.id).power}</b></span></div><button id="race" class="primary-button"><span>▶</span><span>${t.startRace}<small>REWARD UP TO 180 ◈ + XP</small></span><b>↗</b></button></article>`
+      <article class="race-panel"><div class="race-top"><span class="eyebrow">NIGHT CIRCUIT</span><span class="live-dot">● READY</span></div><h3>${t.raceTitle}</h3><p>${t.raceDesc}</p><div class="race-lights" aria-hidden="true"><span>${t.raceLights}</span><i></i><i></i><i></i></div><div class="race-track"><div class="track-glow"></div><div class="track-stripe"></div><div class="speed-lines" aria-hidden="true"></div>${carImage(selected.id,'race-car player-car')}<img class="race-car rival-car" src="${import.meta.env.BASE_URL}cars/vortex.svg" alt="Rival car"/><span class="finish-line">FINISH</span><span class="race-finish-flash" aria-hidden="true"></span></div><div class="race-progress" aria-hidden="true"><i></i></div><div class="race-stats"><span>YOUR CAR <b>${selected.name}</b></span><span>${t.power} <b>${getCarStats(state, selected.id).power}</b></span></div><button id="race" class="primary-button"><span>▶</span><span>${t.startRace}<small>${t.raceRewardLine}</small></span><b>↗</b></button></article>`
     }</section>
     ${notice ? `<div class="notice ${noticeKind}" role="status">${notice}</div>` : ''}
     ${rewardReveal ? `<div class="reward-reveal-backdrop rarity-${rewardReveal.tier}"><article class="reward-reveal-card rarity-${rewardReveal.tier}"><div class="reward-confetti" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="reward-kicker">CASE RUSH · REWARD CONFIRMED</div><div class="reward-stamp">${rewardReveal.carId ? 'NEW CAR' : rewardReveal.partName ? 'PART DROP' : 'CASE OPENED'}</div>${rewardReveal.carId ? carImage(rewardReveal.carId, 'reward-car-image') : '<div class="reward-part-icon">⚙</div>'}<h2>${rewardReveal.carId ? state.cars.find(car => car.id === rewardReveal!.carId)?.name ?? 'NEW CAR' : rewardReveal.partName || (state.language === 'ru' ? 'Дубликат · компенсация начислена' : 'Дублікат · компенсацію нараховано')}</h2><p>${rewardReveal.partName ? `✦ ${rewardReveal.partName}` : rewardReveal.carId ? 'ADDED TO YOUR GARAGE' : 'CREDITS COMPENSATION ADDED'}</p><button id="close-reveal" class="primary-button"><span>✦</span><span>${state.language === 'ru' ? 'Забрать награду' : 'Забрати нагороду'}</span><b>↗</b></button></article></div>` : ''}
@@ -133,19 +133,34 @@ function render(): void {
     notice = state.language === 'ru' ? 'Внешность автомобиля обновлена' : 'Зовнішність автомобіля оновлено';
     noticeKind = 'good'; save(); render();
   }));
-  root.querySelectorAll<HTMLButtonElement>('[data-install-part]').forEach(button => button.addEventListener('click', () => perform(() => {
-    state = installPart(state, button.dataset.slot as PartSlot, button.dataset.installPart!);
-    const part = partCatalog.find(item => item.id === button.dataset.installPart);
-    notice = `${t.installed}: ${part?.name[state.language] ?? ''}`;
-    noticeKind = 'good';
-  })));
-  
-  root.querySelector('#race')?.addEventListener('click', () => perform(() => {
-    const result = race(state, Math.random());
-    state = result.state;
-    notice = result.won ? t.win : t.loss;
-    noticeKind = result.won ? 'good' : 'bad';
+  root.querySelectorAll<HTMLButtonElement>('[data-install-part]').forEach(button => button.addEventListener('click', () => {
+    perform(() => {
+      state = installPart(state, button.dataset.slot as PartSlot, button.dataset.installPart!);
+      const part = partCatalog.find(item => item.id === button.dataset.installPart);
+      notice = `${t.installed}: ${part?.name[state.language] ?? ''}`;
+      noticeKind = 'good';
+    });
+    root.querySelector('.featured-car')?.classList.add('part-installing');
+    window.setTimeout(() => root.querySelector('.featured-car')?.classList.remove('part-installing'), 950);
   }));
+  
+  root.querySelector('#race')?.addEventListener('click', () => {
+    const button = root.querySelector<HTMLButtonElement>('#race');
+    const panel = root.querySelector<HTMLElement>('.race-panel');
+    if (!button || button.disabled || !panel) return;
+    button.disabled = true;
+    panel.classList.add('racing');
+    const status = panel.querySelector<HTMLElement>('.live-dot');
+    if (status) status.textContent = '● ' + t.raceRunning;
+    const label = button.querySelector('span:nth-child(2)');
+    if (label) label.innerHTML = t.raceRunning + '<small>' + t.raceRewardLine + '</small>';
+    window.setTimeout(() => perform(() => {
+      const result = race(state, Math.random());
+      state = result.state;
+      notice = result.won ? t.win + ' · +90 ◈' : t.loss + ' · +10 ◈';
+      noticeKind = result.won ? 'good' : 'bad';
+    }), 2800);
+  });
 }
 function perform(action: () => void): void {
   try { action(); save(); }
