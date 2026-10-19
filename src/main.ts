@@ -1,4 +1,7 @@
 import './style.css';
+import cometSvg from './cars/comet.svg?raw';
+import vortexSvg from './cars/vortex.svg?raw';
+import phantomSvg from './cars/phantom.svg?raw';
 import { initTelegramWebApp } from './telegram';
 import { initialState, openCase, race, safeLoad, getCarStats, installPart, getPartDrop, partCatalog, type GameState, type Language, type PartSlot, type CarAppearance } from './game';
 type Tab = 'garage' | 'cases' | 'races';
@@ -38,7 +41,19 @@ let rewardReveal: { carId: string | null; partName: string; duplicate: boolean; 
 const root = document.querySelector<HTMLDivElement>('#app')!;
 initTelegramWebApp();
 function save(): void { try { localStorage.setItem(key, JSON.stringify(state)); } catch { notice = 'Storage unavailable'; noticeKind = 'bad'; } }
-function carImage(id: string, extra = ''): string { const mods = Object.entries(state.installedParts?.[id] ?? {}).map(([slot]) => `mod-${slot}`).join(' '); const a = state.appearance?.[id] ?? { body: 'factory', neon: 'mint', bodyKit: 'street' }; return `<img class="car-image ${extra} ${mods} body-${a.body} neon-${a.neon} kit-${a.bodyKit}" src="${import.meta.env.BASE_URL}cars/${id}.svg" alt="" draggable="false" />`; }
+const carSvgSources: Record<string, string> = { comet: cometSvg, vortex: vortexSvg, phantom: phantomSvg };
+let carSvgInstance = 0;
+function carImage(id: string, extra = ''): string {
+  const mods = Object.entries(state.installedParts?.[id] ?? {}).map(([slot]) => `mod-${slot}`).join(' ');
+  const a = state.appearance?.[id] ?? { body: 'factory', neon: 'mint', bodyKit: 'street' };
+  const prefix = `cr${++carSvgInstance}`;
+  const ids = new Map<string, string>();
+  let svg = (carSvgSources[id] ?? carSvgSources.comet).replace(/id="([^"]+)"/g, (_match, original: string) => {
+    const unique = `${prefix}-${original}`; ids.set(original, unique); return `id="${unique}"`;
+  });
+  svg = svg.replace(/url\(#([^)]+)\)/g, (_match, original: string) => `url(#${ids.get(original) ?? original})`);
+  return svg.replace('<svg ', `<svg class="car-image ${extra} ${mods} body-${a.body} neon-${a.neon} kit-${a.bodyKit}" role="img" aria-label="${id}" focusable="false" `);
+}
 function installedModBadges(id: string): string { const labels: Record<string, string> = { engine: 'ENGINE', turbo: 'TURBO', tires: 'RACE TYRES', ecu: 'ECU' }; return `<div class="car-mods-overlay">${Object.entries(state.installedParts?.[id] ?? {}).map(([slot]) => `<span class="mod-badge mod-badge-${slot}">✦ ${labels[slot] ?? slot.toUpperCase()}</span>`).join('')}</div>`; }
 function render(): void {
   const t = copy[state.language];

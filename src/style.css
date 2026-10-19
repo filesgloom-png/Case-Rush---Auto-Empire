@@ -125,7 +125,7 @@ button, .car-tile { touch-action: manipulation; }
 .swatch.chosen,.neon-choice.chosen,.kit-choice.chosen{border-color:#69e8c7;box-shadow:0 0 0 1px #69e8c733,0 0 16px #5ce3bd16}
 .neon-choice{display:flex;align-items:center;gap:7px;padding:8px 9px;border:1px solid #30454f;border-radius:8px;background:#111b24;color:#c5d5da;font-size:9px}.neon-choice i{width:8px;height:8px;border-radius:50%;background:#6cf0c9;box-shadow:0 0 11px currentColor}.neon-choice-blue i{background:#64baff;color:#64baff}.neon-choice-pink i{background:#ff70d2;color:#ff70d2}.neon-choice-amber i{background:#ffca69;color:#ffca69}
 .kit-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.kit-choice{min-width:0;text-align:left;padding:10px 8px;border:1px solid #30434d;border-radius:9px;background:#111b24;color:#d9e8eb}.kit-choice b,.kit-choice small{display:block}.kit-choice b{font-size:10px}.kit-choice small{margin-top:5px;color:#8299a3;font-size:7px;line-height:1.35}
-.car-image.body-crimson{filter:hue-rotate(130deg) saturate(1.3)}.car-image.body-blue{filter:hue-rotate(185deg) saturate(1.2)}.car-image.body-violet{filter:hue-rotate(245deg) saturate(1.25)}.car-image.body-gold{filter:hue-rotate(305deg) saturate(1.3)}
+
 .featured-car:has(.neon-blue) .car-backdrop{background:radial-gradient(ellipse at 50% 62%,#2877c548,transparent 65%)}.featured-car:has(.neon-pink) .car-backdrop{background:radial-gradient(ellipse at 50% 62%,#c42a9648,transparent 65%)}.featured-car:has(.neon-amber) .car-backdrop{background:radial-gradient(ellipse at 50% 62%,#c78b2d48,transparent 65%)}
 .featured-car:has(.kit-wide) .featured-image{transform:scaleX(1.08)}.featured-car:has(.kit-track) .featured-image{transform:scaleX(1.04) translateY(-3px)}
 .featured-car:has(.kit-wide) .car-backdrop:after,.featured-car:has(.kit-track) .car-backdrop:after{content:"";position:absolute;left:18%;right:18%;bottom:12px;height:7px;border-radius:50%;background:#63f0c5;filter:blur(9px);opacity:.8}
@@ -136,3 +136,27 @@ button, .car-tile { touch-action: manipulation; }
 @keyframes epic-pulse{0%,100%{filter:drop-shadow(0 0 12px #c18aff66)}50%{filter:drop-shadow(0 0 26px #c18affdd)}}
 @media(max-width:365px){.customizer{padding:13px}.swatch{font-size:8px;padding:5px}.kit-choice{padding:8px 5px}}
 @media(prefers-reduced-motion:reduce){.rarity-epic .reward-car-image{animation:none}.rarity-rare .reward-confetti i,.rarity-epic .reward-confetti i{animation:none}}
+
+/* Real inline-SVG customization: paint affects body-shell only, details are separate vector layers */
+.car-image{display:block;overflow:visible;flex-shrink:0}
+.car-svg,.car-image{--paint-light:#F1FAFC;--paint-mid:#9DB4C0;--paint-highlight:#E2EDF0;--paint-shadow:#52717F;--paint-deep:#203B49;--neon-color:#63F0C5}
+.car-image.body-crimson{--paint-light:#FFD5D5;--paint-mid:#D92E4F;--paint-highlight:#FF6B7F;--paint-shadow:#82162E;--paint-deep:#320C19}
+.car-image.body-blue{--paint-light:#D9F2FF;--paint-mid:#2386C7;--paint-highlight:#59C6FF;--paint-shadow:#174D80;--paint-deep:#0B1D38}
+.car-image.body-violet{--paint-light:#F4DEFF;--paint-mid:#9B55C8;--paint-highlight:#D79AFF;--paint-shadow:#63338E;--paint-deep:#241033}
+.car-image.body-gold{--paint-light:#FFF2B7;--paint-mid:#D59A28;--paint-highlight:#FFE071;--paint-shadow:#885B14;--paint-deep:#33200A}
+.car-image.neon-mint{--neon-color:#63F0C5}.car-image.neon-blue{--neon-color:#63BAFF}.car-image.neon-pink{--neon-color:#FF70D2}.car-image.neon-amber{--neon-color:#FFCA69}
+.body-shell{fill:url(#paint)!important}
+.turbo-detail,.engine-detail,.ecu-detail,.wide-kit-detail,.track-kit-detail,.wheel-race-spokes{display:none}
+.car-image.mod-turbo .turbo-detail,.car-image.mod-engine .engine-detail,.car-image.mod-ecu .ecu-detail,.car-image.mod-tires .wheel-race-spokes{display:inline}
+.car-image.kit-wide .wide-kit-detail,.car-image.kit-track .track-kit-detail{display:inline}
+.car-image.mod-turbo .turbo-detail{filter:drop-shadow(0 0 4px #71DFFF)}
+.car-image.mod-engine .engine-detail{filter:drop-shadow(0 0 5px #65F0CB)}
+.car-image.mod-ecu .ecu-detail{filter:drop-shadow(0 0 6px var(--neon-color))}
+.car-image.mod-tires .wheel-race-spokes{filter:drop-shadow(0 0 3px #6DF2D0)}
+.car-image.kit-wide .wide-kit-detail{filter:drop-shadow(0 0 4px #F4D17C)}
+.car-image.kit-track .track-kit-detail{filter:drop-shadow(0 0 5px #77F5D2)}
+.car-image .neon-glow{stroke:var(--neon-color);opacity:.5;filter:blur(2px)}
+.featured-car:has(.neon-blue) .car-backdrop{background:radial-gradient(ellipse at 50% 62%,#2877c548,transparent 65%)}
+.featured-car:has(.neon-pink) .car-backdrop{background:radial-gradient(ellipse at 50% 62%,#c42a9648,transparent 65%)}
+.featured-car:has(.neon-amber) .car-backdrop{background:radial-gradient(ellipse at 50% 62%,#c78b2d48,transparent 65%)}
+@media(prefers-reduced-motion:reduce){.car-image{animation:none}}

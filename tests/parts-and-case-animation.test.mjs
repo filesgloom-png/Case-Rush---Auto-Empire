@@ -120,3 +120,41 @@ test('garage customization controls save state and rewards style all three rarit
   assert.match(css, /kit-wide/);
   assert.match(css, /neon-pink/);
 });
+
+test('inline SVG car models have isolated paint layers and real visual tuning layers', () => {
+  const app = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+  const css = readFileSync(new URL('../src/style.css', import.meta.url), 'utf8');
+  for (const model of ['comet', 'vortex', 'phantom']) {
+    const svg = readFileSync(new URL('../src/cars/' + model + '.svg', import.meta.url), 'utf8');
+    assert.match(svg, /class="body-shell" fill="url\(#paint\)"/);
+    assert.match(svg, /class="turbo-detail"/);
+    assert.match(svg, /class="wheel-race-spokes"/);
+    assert.match(svg, /class="engine-detail"/);
+    assert.match(svg, /class="ecu-detail"/);
+    assert.match(svg, /class="wide-kit-detail"/);
+    assert.match(svg, /class="track-kit-detail"/);
+    assert.match(svg, /class="neon-glow"/);
+    assert.match(svg, /var\(--paint-/);
+  }
+  assert.match(app, /import cometSvg from '\.\/cars\/comet\.svg\?raw'/);
+  assert.match(app, /carSvgInstance/);
+  assert.match(app, /new Map<string, string>\(\)/);
+  assert.match(css, /\.car-image\.body-crimson\{--paint-light:/);
+  assert.match(css, /\.car-image\.mod-turbo \.turbo-detail/);
+  assert.match(css, /\.car-image\.mod-tires \.wheel-race-spokes/);
+  assert.match(css, /\.car-image\.kit-wide \.wide-kit-detail/);
+  assert.match(css, /\.car-image\.kit-track \.track-kit-detail/);
+  assert.doesNotMatch(css, /\.car-image\.body-crimson\{filter:hue-rotate/);
+});
+
+test('body paint customization preserves separate glass, wheel, lamp and accent layers', () => {
+  const css = readFileSync(new URL('../src/style.css', import.meta.url), 'utf8');
+  for (const color of ['crimson', 'blue', 'violet', 'gold']) assert.match(css, new RegExp('\\.car-image\\.body-' + color + '\\{--paint-light:'));
+  for (const model of ['comet', 'vortex', 'phantom']) {
+    const svg = readFileSync(new URL('../src/cars/' + model + '.svg', import.meta.url), 'utf8');
+    assert.match(svg, /id="glass"/);
+    assert.match(svg, /class="wheel-rim"/);
+    assert.match(svg, /stroke="#FF/);
+    assert.match(svg, /class="body-shell"/);
+  }
+});
