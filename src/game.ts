@@ -17,7 +17,7 @@ export function openCase(state: GameState, roll: number): GameState {
   const tier = roll < 0.7 ? 'common' : roll < 0.95 ? 'rare' : 'epic';
   const prize = starterCars.find(car => car.tier === tier)!;
   const owned = state.cars.find(car => car.id === prize.id)?.owned;
-  const refund = owned ? (tier === 'common' ? 80 : tier === 'rare' ? 180 : 450) : 0;
+  const refund = owned ? (tier === 'common' ? 80 : tier === 'rare' ? 160 : 220) : 0;
   return {
     ...state,
     credits: state.credits - CASE_COST + refund,
