@@ -95,3 +95,28 @@ test('case-opening animation is wired to the real open action and honors reduced
   assert.match(app, /Установи 4 детали/);
   assert.match(app, /Встанови 4 деталі/);
 });
+
+test('appearance presets persist, legacy saves migrate, and corrupt appearance values are rejected', () => {
+  const fresh = initialState();
+  assert.deepEqual(fresh.appearance.comet, { body: 'factory', neon: 'mint', bodyKit: 'street' });
+  const customized = { ...fresh, appearance: { ...fresh.appearance, comet: { body: 'crimson', neon: 'pink', bodyKit: 'wide' } } };
+  assert.deepEqual(safeLoad(JSON.stringify(customized)).appearance.comet, { body: 'crimson', neon: 'pink', bodyKit: 'wide' });
+  const legacy = { ...fresh }; delete legacy.appearance;
+  assert.deepEqual(safeLoad(JSON.stringify(legacy)).appearance.comet, { body: 'factory', neon: 'mint', bodyKit: 'street' });
+  const corrupt = safeLoad(JSON.stringify({ ...customized, appearance: { comet: { body: 'bad', neon: 'nope', bodyKit: 'airplane' } } }));
+  assert.deepEqual(corrupt.appearance.comet, { body: 'factory', neon: 'mint', bodyKit: 'street' });
+});
+
+test('garage customization controls save state and rewards style all three rarity tiers', () => {
+  const app = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+  const css = readFileSync(new URL('../src/style.css', import.meta.url), 'utf8');
+  assert.match(app, /data-appearance/);
+  assert.match(app, /state\.appearance =/);
+  assert.match(app, /localStorage\.setItem\(key, JSON\.stringify\(state\)\)/);
+  assert.match(app, /rarity-\$\{rewardReveal\.tier\}/);
+  assert.match(css, /rarity-common/);
+  assert.match(css, /rarity-rare/);
+  assert.match(css, /rarity-epic/);
+  assert.match(css, /kit-wide/);
+  assert.match(css, /neon-pink/);
+});

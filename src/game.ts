@@ -3,7 +3,9 @@ export type Car = { id: string; name: string; tier: 'common' | 'rare' | 'epic'; 
 export type PartSlot = 'engine' | 'turbo' | 'tires' | 'ecu';
 export type PartTier = 'common' | 'rare' | 'epic';
 export type PartDefinition = { id: string; name: Record<Language, string>; slot: PartSlot; tier: PartTier; power: number; handling: number };
-export type GameState = { credits: number; level: number; xp: number; language: Language; cars: Car[]; selectedCarId: string; history: string[]; casesOpened: number; racesWon: number; upgradesPurchased: number; parts: Record<string, number>; installedParts: Record<string, Partial<Record<PartSlot, string>>> };
+export type CarAppearance = { body: 'factory' | 'crimson' | 'blue' | 'violet' | 'gold'; neon: 'mint' | 'blue' | 'pink' | 'amber'; bodyKit: 'street' | 'wide' | 'track' };
+export const DEFAULT_APPEARANCE: CarAppearance = { body: 'factory', neon: 'mint', bodyKit: 'street' };
+export type GameState = { appearance: Record<string, CarAppearance>; credits: number; level: number; xp: number; language: Language; cars: Car[]; selectedCarId: string; history: string[]; casesOpened: number; racesWon: number; upgradesPurchased: number; parts: Record<string, number>; installedParts: Record<string, Partial<Record<PartSlot, string>>> };
 export const CASE_COST = 250;
 export const UPGRADE_COST = 300;
 export const MAX_CREDITS = Number.MAX_SAFE_INTEGER;
@@ -31,7 +33,7 @@ export const partCatalog: PartDefinition[] = [
 const emptyParts = (): Record<string, number> => Object.fromEntries(partCatalog.map(part => [part.id, 0]));
 const emptyInstalled = (): Record<string, Partial<Record<PartSlot, string>>> => Object.fromEntries(starterCars.map(car => [car.id, {}]));
 export function initialState(): GameState {
-  return { credits: 1000, level: 1, xp: 0, language: 'ru', cars: starterCars.map(car => ({ ...car })), selectedCarId: 'comet', history: [], casesOpened: 0, racesWon: 0, upgradesPurchased: 0, parts: emptyParts(), installedParts: emptyInstalled() };
+  return { appearance: Object.fromEntries(starterCars.map(car => [car.id, { ...DEFAULT_APPEARANCE }])), credits: 1000, level: 1, xp: 0, language: 'ru', cars: starterCars.map(car => ({ ...car })), selectedCarId: 'comet', history: [], casesOpened: 0, racesWon: 0, upgradesPurchased: 0, parts: emptyParts(), installedParts: emptyInstalled() };
 }
 export function getPartDrop(tierRoll: number, slotRoll: number): PartDefinition {
   if (!Number.isFinite(tierRoll) || tierRoll < 0 || tierRoll >= 1 || !Number.isFinite(slotRoll) || slotRoll < 0 || slotRoll >= 1) throw new Error('INVALID_PART_ROLL');
@@ -140,9 +142,10 @@ export function safeLoad(raw: string | null): GameState {
         if (typeof id === 'string' && partCatalog.some(part => part.id === id && part.slot === slot)) installedParts[car.id][slot] = id;
       }
     }
+    const appearance = Object.fromEntries(starterCars.map(car => { const saved = s.appearance && typeof s.appearance === 'object' ? (s.appearance as Record<string, unknown>)[car.id] : null; const a = saved && typeof saved === 'object' ? saved as Record<string, unknown> : {}; const allowed = (v: unknown, list: string[], fallback: string) => typeof v === 'string' && list.includes(v) ? v : fallback; return [car.id, { body: allowed(a.body, ['factory','crimson','blue','violet','gold'], 'factory'), neon: allowed(a.neon, ['mint','blue','pink','amber'], 'mint'), bodyKit: allowed(a.bodyKit, ['street','wide','track'], 'street') }]; }));
     const level = 1 + Math.floor(xp / 100);
     return {
-      credits: s.credits!, level, xp, language: s.language!, cars, selectedCarId,
+      appearance, credits: s.credits!, level, xp, language: s.language!, cars, selectedCarId,
       history: s.history.filter((item): item is string => typeof item === 'string').slice(0, 20),
       casesOpened: Number.isSafeInteger(s.casesOpened) && s.casesOpened! >= 0 && s.casesOpened! <= MAX_PROGRESS_COUNTER ? s.casesOpened! : 0,
       racesWon: Number.isSafeInteger(s.racesWon) && s.racesWon! >= 0 && s.racesWon! <= MAX_PROGRESS_COUNTER ? s.racesWon! : 0,
