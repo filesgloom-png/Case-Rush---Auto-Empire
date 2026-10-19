@@ -1,6 +1,6 @@
 import './style.css';
 import { initTelegramWebApp } from './telegram';
-import { initialState, openCase, upgrade, race, safeLoad, getCarStats, installPart, getPartDrop, partCatalog, type GameState, type Language, type PartSlot } from './game';
+import { initialState, openCase, race, safeLoad, getCarStats, installPart, getPartDrop, partCatalog, type GameState, type Language, type PartSlot } from './game';
 type Tab = 'garage' | 'cases' | 'races';
 const copy = {
   ru: {
