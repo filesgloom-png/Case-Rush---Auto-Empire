@@ -209,3 +209,20 @@ test('night circuit has animated start lights, acceleration, progress, finish ef
  assert.match(css, /@media\(prefers-reduced-motion:reduce\)/);
  assert.match(css, /part-install-pop/);
 });
+
+
+test('installed part rarity drives real SVG highlights and case reveal advances through explicit stages', () => {
+  const app = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+  const css = readFileSync(new URL('../src/style.css', import.meta.url), 'utf8');
+  assert.match(app, /mod-\$\{slot\}-tier-\$\{part\.tier\}/);
+  assert.match(app, /classList\.add\('opening', 'charging'\)/);
+  assert.match(app, /classList\.add\('surge'\)/);
+  assert.match(app, /classList\.add\('unlocking'\)/);
+  for (const slot of ['engine', 'turbo', 'tires', 'ecu']) {
+    assert.match(css, new RegExp('\\.car-image\\.mod-' + slot + '-tier-epic'));
+  }
+  assert.match(css, /\.case-panel\.charging/);
+  assert.match(css, /\.case-panel\.surge/);
+  assert.match(css, /\.case-panel\.unlocking/);
+  assert.match(css, /prefers-reduced-motion:reduce/);
+});
