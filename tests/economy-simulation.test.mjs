@@ -113,6 +113,25 @@ test('deterministic economy simulation compares saving, cases, and upgrade-first
   assert.ok(longRun.save.averageWins > shortRun.save.averageWins);
   assert.ok(longRun.cases.averageCases >= shortRun.cases.averageCases);
   assert.ok(longRun['upgrade-first'].averageUpgrades >= shortRun['upgrade-first'].averageUpgrades);
+
+  // Fixed cohort snapshots make balance, progression, and strategy trade-offs regression-testable.
+  const pick = metrics => [metrics.averageCredits, metrics.averageXp, metrics.averageWins, metrics.averageCases, metrics.averageUpgrades];
+  assert.deepEqual(
+    Object.fromEntries(Object.entries(shortRun).map(([strategy, metrics]) => [strategy, pick(metrics)])),
+    {
+      save: [129127.96875, 19014.765625, 600.984375, 0, 0],
+      cases: [258.28125, 11047.890625, 441.796875, 557.90625, 0],
+      'upgrade-first': [179560, 24925, 997, 0, 3]
+    }
+  );
+  assert.deepEqual(
+    Object.fromEntries(Object.entries(longRun).map(([strategy, metrics]) => [strategy, pick(metrics)])),
+    {
+      save: [1288397.8125, 190853.59375, 6056.90625, 0, 0],
+      cases: [265.3125, 110654.53125, 4426.0625, 5573.640625, 0],
+      'upgrade-first': [1799560, 249925, 9997, 0, 3]
+    }
+  );
   console.log('ECONOMY_SIMULATION_JSON=' + JSON.stringify({ actions1000: shortRun, actions10000: longRun }));
 });
 
