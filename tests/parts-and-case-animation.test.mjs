@@ -69,3 +69,15 @@ test('legacy saves migrate with empty parts and installed slots; valid part prog
   assert.equal(corrupted.installedParts.comet.engine, undefined);
   assert.equal(corrupted.installedParts.comet.turbo, undefined);
 });
+
+
+test('case-opening animation is wired to the real open action and honors reduced motion', () => {
+  const app = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+  const css = readFileSync(new URL('../src/style.css', import.meta.url), 'utf8');
+  assert.match(app, /classList\.add\('opening'\)/);
+  assert.match(app, /window\.setTimeout\(\(\) => perform/);
+  assert.match(css, /@keyframes case-rush-shake/);
+  assert.match(css, /prefers-reduced-motion:reduce/);
+  assert.match(app, /Установи 4 детали/);
+  assert.match(app, /Встанови 4 деталі/);
+});
