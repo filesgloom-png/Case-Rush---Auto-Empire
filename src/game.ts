@@ -5,7 +5,7 @@ export type PartTier = 'common' | 'rare' | 'epic';
 export type PartDefinition = { id: string; name: Record<Language, string>; slot: PartSlot; tier: PartTier; power: number; handling: number };
 export type CarAppearance = { body: 'factory' | 'crimson' | 'blue' | 'violet' | 'gold'; neon: 'mint' | 'blue' | 'pink' | 'amber'; bodyKit: 'street' | 'wide' | 'track' };
 export const DEFAULT_APPEARANCE: CarAppearance = { body: 'factory', neon: 'mint', bodyKit: 'street' };
-export type GameState = { appearance: Record<string, CarAppearance>; credits: number; level: number; xp: number; language: Language; cars: Car[]; selectedCarId: string; history: string[]; casesOpened: number; racesWon: number; upgradesPurchased: number; parts: Record<string, number>; installedParts: Record<string, Partial<Record<PartSlot, string>>> };
+export type GameState = { appearance: Record<string, CarAppearance>; credits: number; level: number; xp: number; language: Language; cars: Car[]; selectedCarId: string; history: string[]; casesOpened: number; racesWon: number; upgradesPurchased: number; parts: Record<string, number>; installedParts: Record<string, Partial<Record<PartSlot, string>>>; careerStage: number; careerWins: number; careerStreak: number; careerBonusClaimed: number[] };
 export const CASE_COST = 250;
 export const UPGRADE_COST = 300;
 export const MAX_CREDITS = Number.MAX_SAFE_INTEGER;
@@ -30,10 +30,21 @@ export const partCatalog: PartDefinition[] = [
   { id: 'ecu-rare', name: { ru: 'Чип Stage 2', uk: 'Чип Stage 2' }, slot: 'ecu', tier: 'rare', power: 11, handling: 2 },
   { id: 'ecu-epic', name: { ru: 'ЭБУ Racing', uk: 'ЕБУ Racing' }, slot: 'ecu', tier: 'epic', power: 18, handling: 4 }
 ];
+export type CareerStage = { id: number; title: Record<Language, string>; track: 'night' | 'industrial' | 'desert' | 'skyline'; opponentPower: number; requiredPower: number; requiredHandling: number; requiredParts: PartSlot[]; reward: number };
+export const careerStages: CareerStage[] = [
+  { id: 1, title: { ru: 'Неоновые доки', uk: 'Неонові доки' }, track: 'night', opponentPower: 145, requiredPower: 100, requiredHandling: 55, requiredParts: [], reward: 60 },
+  { id: 2, title: { ru: 'Промышленная петля', uk: 'Промислова петля' }, track: 'industrial', opponentPower: 160, requiredPower: 112, requiredHandling: 62, requiredParts: ['engine'], reward: 80 },
+  { id: 3, title: { ru: 'Пустынный спринт', uk: 'Пустельний спринт' }, track: 'desert', opponentPower: 175, requiredPower: 125, requiredHandling: 68, requiredParts: ['tires'], reward: 100 },
+  { id: 4, title: { ru: 'Скайлайн', uk: 'Скайлайн' }, track: 'skyline', opponentPower: 190, requiredPower: 140, requiredHandling: 72, requiredParts: ['engine', 'ecu'], reward: 120 },
+  { id: 5, title: { ru: 'Заводской коридор', uk: 'Заводський коридор' }, track: 'industrial', opponentPower: 205, requiredPower: 160, requiredHandling: 76, requiredParts: ['turbo', 'tires'], reward: 140 },
+  { id: 6, title: { ru: 'Ночная эстакада', uk: 'Нічна естакада' }, track: 'night', opponentPower: 220, requiredPower: 180, requiredHandling: 80, requiredParts: ['engine', 'turbo', 'tires'], reward: 160 },
+  { id: 7, title: { ru: 'Город на пределе', uk: 'Місто на межі' }, track: 'skyline', opponentPower: 235, requiredPower: 205, requiredHandling: 84, requiredParts: ['engine', 'turbo', 'tires', 'ecu'], reward: 180 },
+  { id: 8, title: { ru: 'Финальный круг', uk: 'Фінальне коло' }, track: 'desert', opponentPower: 250, requiredPower: 230, requiredHandling: 88, requiredParts: ['engine', 'turbo', 'tires', 'ecu'], reward: 220 }
+];
 const emptyParts = (): Record<string, number> => Object.fromEntries(partCatalog.map(part => [part.id, 0]));
 const emptyInstalled = (): Record<string, Partial<Record<PartSlot, string>>> => Object.fromEntries(starterCars.map(car => [car.id, {}]));
 export function initialState(): GameState {
-  return { appearance: Object.fromEntries(starterCars.map(car => [car.id, { ...DEFAULT_APPEARANCE }])), credits: 1000, level: 1, xp: 0, language: 'ru', cars: starterCars.map(car => ({ ...car })), selectedCarId: 'comet', history: [], casesOpened: 0, racesWon: 0, upgradesPurchased: 0, parts: emptyParts(), installedParts: emptyInstalled() };
+  return { appearance: Object.fromEntries(starterCars.map(car => [car.id, { ...DEFAULT_APPEARANCE }])), credits: 1000, level: 1, xp: 0, language: 'ru', cars: starterCars.map(car => ({ ...car })), selectedCarId: 'comet', history: [], casesOpened: 0, racesWon: 0, upgradesPurchased: 0, parts: emptyParts(), installedParts: emptyInstalled(), careerStage: 1, careerWins: 0, careerStreak: 0, careerBonusClaimed: [] };
 }
 export function getPartDrop(tierRoll: number, slotRoll: number): PartDefinition {
   if (!Number.isFinite(tierRoll) || tierRoll < 0 || tierRoll >= 1 || !Number.isFinite(slotRoll) || slotRoll < 0 || slotRoll >= 1) throw new Error('INVALID_PART_ROLL');
@@ -103,16 +114,41 @@ export function upgrade(state: GameState): GameState {
   if (!Number.isSafeInteger(selected.power) || selected.power < 0 || selected.power > 10000 || selected.power > 9990) throw new Error('MAX_UPGRADE');
   return { ...state, credits: state.credits - UPGRADE_COST, cars: state.cars.map(car => car.id === selected.id ? { ...car, power: car.power + 10 } : car), upgradesPurchased: Math.min(MAX_PROGRESS_COUNTER, (Number.isSafeInteger(state.upgradesPurchased) && state.upgradesPurchased >= 0 ? state.upgradesPurchased : 0) + 1) };
 }
+function applyRaceOutcome(state: GameState, won: boolean, creditReward: number, historyLabel?: string): GameState {
+  const currentCredits = Number.isSafeInteger(state.credits) && state.credits >= 0 ? state.credits : 0;
+  const currentXp = Number.isSafeInteger(state.xp) && state.xp >= 0 ? Math.min(state.xp, MAX_XP) : 0;
+  const xp = Math.min(MAX_XP, currentXp + (won ? 25 : 10));
+  const car = state.cars.find(item => item.id === state.selectedCarId && item.owned)!;
+  return { ...state, credits: Math.min(MAX_CREDITS, currentCredits + creditReward), level: 1 + Math.floor(xp / 100), xp, history: [(historyLabel ?? ((won ? 'WIN ' : 'LOSS ') + car.name)), ...state.history].slice(0, 20), racesWon: Math.min(MAX_PROGRESS_COUNTER, (Number.isSafeInteger(state.racesWon) && state.racesWon >= 0 ? state.racesWon : 0) + (won ? 1 : 0)) };
+}
 export function race(state: GameState, roll: number): { state: GameState; won: boolean } {
   if (!Number.isFinite(roll) || roll < 0 || roll >= 1) throw new Error('INVALID_ROLL');
   const car = state.cars.find(item => item.id === state.selectedCarId && item.owned);
   if (!car) throw new Error('NO_CAR');
   const stats = getCarStats(state, car.id);
   const won = stats.power + stats.handling * 0.4 + roll * 60 >= 155;
-  const currentCredits = Number.isSafeInteger(state.credits) && state.credits >= 0 ? state.credits : 0;
-  const currentXp = Number.isSafeInteger(state.xp) && state.xp >= 0 ? Math.min(state.xp, MAX_XP) : 0;
-  const xp = Math.min(MAX_XP, currentXp + (won ? 25 : 10));
-  return { won, state: { ...state, credits: Math.min(MAX_CREDITS, currentCredits + (won ? 90 : 10)), level: 1 + Math.floor(xp / 100), xp, history: [(won ? 'WIN ' : 'LOSS ') + car.name, ...state.history].slice(0, 20), racesWon: Math.min(MAX_PROGRESS_COUNTER, (Number.isSafeInteger(state.racesWon) && state.racesWon >= 0 ? state.racesWon : 0) + (won ? 1 : 0)) } };
+  return { won, state: applyRaceOutcome(state, won, won ? 90 : 10) };
+}
+export function careerRace(state: GameState, roll: number): { state: GameState; won: boolean; eligible: boolean; stage: CareerStage; reward: number; bonus: number } {
+  if (!Number.isFinite(roll) || roll < 0 || roll >= 1) throw new Error('INVALID_ROLL');
+  const stageIndex = Number.isSafeInteger(state.careerStage) && state.careerStage > 0 ? state.careerStage : 1;
+  const stage = careerStages[stageIndex - 1];
+  if (!stage) throw new Error('CAREER_COMPLETE');
+  const car = state.cars.find(item => item.id === state.selectedCarId && item.owned);
+  if (!car) throw new Error('NO_CAR');
+  const stats = getCarStats(state, car.id);
+  const installed = state.installedParts?.[car.id] ?? {};
+  const eligible = stats.power >= stage.requiredPower && stats.handling >= stage.requiredHandling && stage.requiredParts.every(slot => Boolean(installed[slot]));
+  const won = eligible && stats.power + stats.handling * 0.4 + roll * 60 >= stage.opponentPower;
+  const oldStreak = Number.isSafeInteger(state.careerStreak) && state.careerStreak >= 0 ? state.careerStreak : 0;
+  const streak = won ? oldStreak + 1 : 0;
+  const claimed = Array.isArray(state.careerBonusClaimed) ? state.careerBonusClaimed.filter(n => n === 3 || n === 6) : [];
+  const milestone = won && (streak === 3 || streak === 6) && !claimed.includes(streak) ? streak : 0;
+  const bonus = milestone === 3 ? 120 : milestone === 6 ? 200 : 0;
+  const reward = won ? stage.reward + bonus : 10;
+  const outcomeState = applyRaceOutcome(state, won, reward, (won ? 'CAREER WIN ' : 'CAREER LOSS ') + stage.id + ' · ' + stage.title.ru);
+  const nextState: GameState = { ...outcomeState, careerStage: won ? stage.id + 1 : stage.id, careerWins: Math.min(MAX_PROGRESS_COUNTER, (Number.isSafeInteger(state.careerWins) && state.careerWins >= 0 ? state.careerWins : 0) + (won ? 1 : 0)), careerStreak: streak, careerBonusClaimed: milestone ? [...claimed, milestone] : claimed };
+  return { state: nextState, won, eligible, stage, reward, bonus };
 }
 export function safeLoad(raw: string | null): GameState {
   if (!raw) return initialState();
@@ -150,6 +186,10 @@ export function safeLoad(raw: string | null): GameState {
       casesOpened: Number.isSafeInteger(s.casesOpened) && s.casesOpened! >= 0 && s.casesOpened! <= MAX_PROGRESS_COUNTER ? s.casesOpened! : 0,
       racesWon: Number.isSafeInteger(s.racesWon) && s.racesWon! >= 0 && s.racesWon! <= MAX_PROGRESS_COUNTER ? s.racesWon! : 0,
       upgradesPurchased: Number.isSafeInteger(s.upgradesPurchased) && s.upgradesPurchased! >= 0 && s.upgradesPurchased! <= MAX_PROGRESS_COUNTER ? s.upgradesPurchased! : 0,
+      careerStage: Number.isSafeInteger(s.careerStage) && s.careerStage! >= 1 && s.careerStage! <= careerStages.length + 1 ? s.careerStage! : 1,
+      careerWins: Number.isSafeInteger(s.careerWins) && s.careerWins! >= 0 && s.careerWins! <= MAX_PROGRESS_COUNTER ? s.careerWins! : 0,
+      careerStreak: Number.isSafeInteger(s.careerStreak) && s.careerStreak! >= 0 && s.careerStreak! <= careerStages.length ? s.careerStreak! : 0,
+      careerBonusClaimed: Array.isArray(s.careerBonusClaimed) ? [...new Set(s.careerBonusClaimed.filter((n): n is number => n === 3 || n === 6))] : [],
       parts, installedParts
     };
   } catch { return initialState(); }
