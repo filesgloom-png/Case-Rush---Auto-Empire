@@ -155,7 +155,7 @@ function render(): void {
     const button = root.querySelector<HTMLButtonElement>('#career-race'); const panel = root.querySelector<HTMLElement>('.career-card');
     if (!button || button.disabled || !panel) return; button.disabled = true; panel.classList.add('racing');
     const label = button.querySelector('span:nth-child(2)'); if (label) label.innerHTML = t.raceRunning + '<small>' + t.careerReward + '</small>';
-    window.setTimeout(() => perform(() => { const result = careerRace(state, Math.random()); state = result.state; notice = result.won ? t.win + ' · +' + result.reward + ' ◈' + (result.bonus ? ' · ' + t.bonus + ' +' + result.bonus : '') : (result.eligible ? t.loss : t.notReady) + ' · +10 ◈'; noticeKind = result.won ? 'good' : 'bad'; }), 2800);
+    window.setTimeout(() => perform(() => { const result = careerRace(state, Math.random()); state = result.state; notice = result.won ? t.win + ' · +' + result.reward + ' ◈' + (result.bonus ? ' · ' + t.bonus + ' +' + result.bonus : '') : (result.eligible ? t.loss : t.notReady) + ' · 0 ◈'; noticeKind = result.won ? 'good' : 'bad'; }), 2800);
   });
   root.querySelector('#race')?.addEventListener('click', () => {
     const button = root.querySelector<HTMLButtonElement>('#race');

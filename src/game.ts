@@ -145,7 +145,7 @@ export function careerRace(state: GameState, roll: number): { state: GameState; 
   const claimed = Array.isArray(state.careerBonusClaimed) ? state.careerBonusClaimed.filter(n => n === 3 || n === 6) : [];
   const milestone = won && (streak === 3 || streak === 6) && !claimed.includes(streak) ? streak : 0;
   const bonus = milestone === 3 ? 120 : milestone === 6 ? 200 : 0;
-  const reward = won ? stage.reward + bonus : 10;
+  const reward = won ? stage.reward + bonus : 0;
   const outcomeState = applyRaceOutcome(state, won, reward, (won ? 'CAREER WIN ' : 'CAREER LOSS ') + stage.id + ' · ' + stage.title.ru);
   const nextState: GameState = { ...outcomeState, careerStage: won ? stage.id + 1 : stage.id, careerWins: Math.min(MAX_PROGRESS_COUNTER, (Number.isSafeInteger(state.careerWins) && state.careerWins >= 0 ? state.careerWins : 0) + (won ? 1 : 0)), careerStreak: streak, careerBonusClaimed: milestone ? [...claimed, milestone] : claimed };
   return { state: nextState, won, eligible, stage, reward, bonus };

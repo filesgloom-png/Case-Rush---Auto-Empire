@@ -54,6 +54,7 @@ test('streak bonuses are one-time and failed attempts reset the streak', () => {
   assert.deepEqual(third.state.careerBonusClaimed, [3]);
   const failed = careerRace({ ...third.state, careerStage: 2, careerStreak: 3 }, 0);
   assert.equal(failed.state.careerStreak, 0);
+  assert.equal(failed.reward, 0, 'failed career attempts do not pay credits and cannot be farmed');
   assert.deepEqual(failed.state.careerBonusClaimed, [3]);
 });
 
@@ -71,6 +72,33 @@ test('career save fields migrate and invalid values are clamped safely', () => {
   assert.equal(migrated.careerStreak, 0);
   assert.deepEqual(migrated.careerBonusClaimed, []);
   assert.equal(safeLoad(JSON.stringify({ ...initialState(), careerStage: 99 })).careerStage, 1);
+});
+
+
+test('complete career simulation has a fixed total payout and cannot replay completed stages', () => {
+  let state = initialState();
+  state = {
+    ...state,
+    cars: state.cars.map(car => car.id === 'comet' ? { ...car, power: 230, handling: 100 } : car),
+    installedParts: { ...state.installedParts, comet: { engine: 'engine-epic', turbo: 'turbo-epic', tires: 'tires-epic', ecu: 'ecu-epic' } }
+  };
+  const startingCredits = state.credits;
+  for (let i = 0; i < 8; i++) {
+    const result = careerRace(state, 0.999);
+    assert.equal(result.won, true, 'fully prepared car clears every stage');
+    state = result.state;
+  }
+  assert.equal(state.careerStage, 9);
+  assert.equal(state.careerWins, 8);
+  assert.deepEqual(state.careerBonusClaimed, [3, 6]);
+  assert.equal(state.credits - startingCredits, 1_380, 'stage payouts total 1,060 and one-time streak bonuses total 320');
+  assert.throws(() => careerRace(state, 0.999), /CAREER_COMPLETE/);
+  for (let i = 0; i < 50; i++) {
+    const failed = careerRace({ ...initialState(), careerStage: 2 }, 0.999);
+    assert.equal(failed.won, false);
+    assert.equal(failed.reward, 0);
+    assert.equal(failed.state.credits, initialState().credits);
+  }
 });
 
 test('career UI offers sprint and career, varied tracks and reduced-motion support', () => {
