@@ -34,10 +34,12 @@ try { state = safeLoad(localStorage.getItem(key)); } catch { state = initialStat
 let tab: Tab = 'garage';
 let notice = '';
 let noticeKind: 'good' | 'bad' = 'good';
+let rewardReveal: { carId: string | null; partName: string; duplicate: boolean } | null = null;
 const root = document.querySelector<HTMLDivElement>('#app')!;
 initTelegramWebApp();
 function save(): void { try { localStorage.setItem(key, JSON.stringify(state)); } catch { notice = 'Storage unavailable'; noticeKind = 'bad'; } }
-function carImage(id: string, extra = ''): string { return `<img class="car-image ${extra}" src="${import.meta.env.BASE_URL}cars/${id}.svg" alt="" draggable="false" />`; }
+function carImage(id: string, extra = ''): string { const mods = Object.entries(state.installedParts?.[id] ?? {}).map(([slot]) => `mod-${slot}`).join(' '); return `<img class="car-image ${extra} ${mods}" src="${import.meta.env.BASE_URL}cars/${id}.svg" alt="" draggable="false" />`; }
+function installedModBadges(id: string): string { const labels: Record<string, string> = { engine: 'ENGINE', turbo: 'TURBO', tires: 'RACE TYRES', ecu: 'ECU' }; return `<div class="car-mods-overlay">${Object.entries(state.installedParts?.[id] ?? {}).map(([slot]) => `<span class="mod-badge mod-badge-${slot}">✦ ${labels[slot] ?? slot.toUpperCase()}</span>`).join('')}</div>`; }
 function render(): void {
   const t = copy[state.language];
   const selected = state.cars.find(car => car.id === state.selectedCarId && car.owned) ?? state.cars.find(car => car.owned)!;
@@ -51,7 +53,7 @@ function render(): void {
     <section class="screen">
     ${tab === 'garage' ? `
       <div class="section-head"><div><span class="eyebrow">01 / COLLECTION</span><h2>${t.collection}</h2></div><span class="count-pill">${state.cars.filter(car => car.owned).length.toString().padStart(2,'0')} <small>/ ${state.cars.length.toString().padStart(2,'0')}</small></span></div>
-      <article class="featured-car"><div class="car-backdrop"></div><div class="car-tag">${selected.tier.toUpperCase()} CLASS <span>•</span> #${selected.id.toUpperCase()}</div>${carImage(selected.id, 'featured-image')}<div class="car-info"><div><h3>${selected.name}</h3><p>STREET SERIES <span>·</span> MODEL 2026</p></div><span class="tier-dot ${selected.tier}"></span></div>
+      <article class="featured-car"><div class="car-backdrop"></div><div class="car-tag">${selected.tier.toUpperCase()} CLASS <span>•</span> #${selected.id.toUpperCase()}</div>${carImage(selected.id, 'featured-image')}${installedModBadges(selected.id)}<div class="car-info"><div><h3>${selected.name}</h3><p>STREET SERIES <span>·</span> MODEL 2026</p></div><span class="tier-dot ${selected.tier}"></span></div>
         <div class="stat-grid"><div class="stat"><div><span>${t.power}</span><b>${getCarStats(state, selected.id).power}</b></div><div class="meter"><i style="width:${Math.min(100, getCarStats(state, selected.id).power / 3)}%"></i></div></div><div class="stat"><div><span>${t.handling}</span><b>${getCarStats(state, selected.id).handling}</b></div><div class="meter"><i style="width:${getCarStats(state, selected.id).handling}%"></i></div></div></div>
         <div class="parts-workbench"><div class="parts-head"><h3>${t.parts}</h3><span>${t.partDrop}</span></div>${(['engine','turbo','tires','ecu'] as PartSlot[]).map(slot => { const equippedId = state.installedParts?.[selected.id]?.[slot]; const equipped = partCatalog.find(part => part.id === equippedId); const options = partCatalog.filter(part => part.slot === slot && (state.parts?.[part.id] ?? 0) > 0); return `<div class="part-slot"><div class="part-slot-head"><b>${t[slot]}</b><span>${equipped ? `${equipped.name[state.language]} · +${equipped.power} ${t.powerShort} / +${equipped.handling} ${t.handlingShort}` : t.emptySlot}</span></div><div class="part-options">${options.length ? options.map(part => `<button data-install-part="${part.id}" data-slot="${slot}" class="part-chip ${part.tier}">${part.name[state.language]} <small>×${state.parts[part.id]}</small></button>`).join('') : `<small class="part-empty">${t.noParts}</small>`}</div></div>`; }).join('')}</div>
       </article>
@@ -66,6 +68,7 @@ function render(): void {
       <article class="race-panel"><div class="race-top"><span class="eyebrow">NIGHT CIRCUIT</span><span class="live-dot">● READY</span></div><h3>${t.raceTitle}</h3><p>${t.raceDesc}</p><div class="race-track"><div class="track-glow"></div><div class="track-stripe"></div>${carImage(selected.id,'race-car player-car')}<img class="race-car rival-car" src="${import.meta.env.BASE_URL}cars/vortex.svg" alt="Rival car"/><span class="finish-line">FINISH</span></div><div class="race-stats"><span>YOUR CAR <b>${selected.name}</b></span><span>${t.power} <b>${getCarStats(state, selected.id).power}</b></span></div><button id="race" class="primary-button"><span>▶</span><span>${t.startRace}<small>REWARD UP TO 180 ◈ + XP</small></span><b>↗</b></button></article>`
     }</section>
     ${notice ? `<div class="notice ${noticeKind}" role="status">${notice}</div>` : ''}
+    ${rewardReveal ? `<div class="reward-reveal-backdrop"><article class="reward-reveal-card"><div class="reward-confetti" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="reward-kicker">CASE RUSH · REWARD CONFIRMED</div><div class="reward-stamp">${rewardReveal.carId ? 'NEW CAR' : rewardReveal.partName ? 'PART DROP' : 'CASE OPENED'}</div>${rewardReveal.carId ? carImage(rewardReveal.carId, 'reward-car-image') : '<div class="reward-part-icon">⚙</div>'}<h2>${rewardReveal.carId ? state.cars.find(car => car.id === rewardReveal!.carId)?.name ?? 'NEW CAR' : rewardReveal.partName || (state.language === 'ru' ? 'Дубликат · компенсация начислена' : 'Дублікат · компенсацію нараховано')}</h2><p>${rewardReveal.partName ? `✦ ${rewardReveal.partName}` : rewardReveal.carId ? 'ADDED TO YOUR GARAGE' : 'CREDITS COMPENSATION ADDED'}</p><button id="close-reveal" class="primary-button"><span>✦</span><span>${state.language === 'ru' ? 'Забрать награду' : 'Забрати нагороду'}</span><b>↗</b></button></article></div>` : ''}
     <section class="history"><div class="history-head"><h3>${t.history}</h3><span>RECENT</span></div>${state.history.length ? state.history.slice(0,3).map((event,i) => `<div class="history-item"><span class="history-index">0${i+1}</span><span>${event}</span><i>↗</i></div>`).join('') : `<p class="empty-history">${t.empty}</p>`}</section>
     <section class="achievements"><div class="history-head"><h3>${t.achievements}</h3><span>${state.cars.filter(car => car.owned).length}/${state.cars.length} CARS</span></div>
       ${[
@@ -77,6 +80,7 @@ function render(): void {
     </section>
     <footer><span class="footer-mark">CR</span><span>${t.demo}</span></footer>
   </main>`;
+  root.querySelector('#close-reveal')?.addEventListener('click', () => { rewardReveal = null; render(); });
   root.querySelector('#lang')?.addEventListener('click', () => { state.language = (state.language === 'ru' ? 'uk' : 'ru') as Language; notice = ''; save(); render(); });
   root.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach(button => button.addEventListener('click', () => { tab = button.dataset.tab as Tab; notice = ''; render(); }));
   root.querySelectorAll<HTMLButtonElement>('[data-car]').forEach(button => button.addEventListener('click', () => { state.selectedCarId = button.dataset.car!; notice = ''; save(); render(); }));
@@ -95,6 +99,7 @@ function render(): void {
       const prize = state.cars.find((car, i) => car.owned && !previous[i]);
       notice = [prize ? `${t.caseReceived} ${prize.name}` : t.duplicate, part ? `${state.language === 'ru' ? 'ДЕТАЛЬ' : 'ДЕТАЛЬ'}: ${part.name[state.language]}` : ''].filter(Boolean).join(' · ');
       noticeKind = 'good';
+      rewardReveal = { carId: prize?.id ?? null, partName: part?.name[state.language] ?? '', duplicate: !prize };
     }), 1900);
   });
   root.querySelectorAll<HTMLButtonElement>('[data-install-part]').forEach(button => button.addEventListener('click', () => perform(() => {
