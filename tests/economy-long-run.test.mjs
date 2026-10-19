@@ -24,7 +24,7 @@ const strategies = [
   { id: 'cases', caseThreshold: CASE_COST, upgradeReserve: Infinity },
   { id: 'cases-reserve-1000', caseThreshold: 1_000 + CASE_COST, upgradeReserve: Infinity },
   { id: 'upgrade-first', caseThreshold: Infinity, upgradeReserve: UPGRADE_COST },
-  { id: 'upgrade-reserve-500', caseThreshold: UPGRADE_COST + 500, upgradeReserve: Infinity },
+  { id: 'upgrade-reserve-500', caseThreshold: Infinity, upgradeReserve: UPGRADE_COST + 500 },
   { id: 'balanced', caseThreshold: 1_000, upgradeReserve: UPGRADE_COST + 300 }
 ];
 
