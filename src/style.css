@@ -356,3 +356,25 @@ body{background-image:radial-gradient(ellipse at 84% 0%,#40231e 0%,transparent 3
 @keyframes case-core-spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 @media(max-width:380px){.car-mods-overlay{max-width:51%;top:69px;right:8px;gap:4px}.mod-badge{padding:5px 6px}.mod-badge b{font-size:7px}.mod-badge small{font-size:7px}.mod-badge i{font-size:6px}.goal-gap,.goal-check{font-size:6px!important;padding:3px}}
 @media(prefers-reduced-motion:reduce){.mod-badge,.case-panel.opening .case-stage:before,.case-panel.opening .case-stage:after,.case-panel.opening .case-image,.case-panel.opening .case-scanline,.case-panel.opening .case-sparks i{animation:none!important}.case-panel.opening .case-stage:before{transform:none;opacity:.85}.case-panel.opening .case-stage:after{transform:none}}
+
+
+/* Part rarity is visible on the actual car, not only in inventory labels. */
+.car-image.mod-engine-tier-common .engine-detail{filter:drop-shadow(0 0 4px #d9ff68)}
+.car-image.mod-engine-tier-rare .engine-detail{filter:drop-shadow(0 0 5px #7ad9ff) drop-shadow(0 0 10px #7ad9ff88)}
+.car-image.mod-engine-tier-epic .engine-detail{filter:drop-shadow(0 0 5px #e7a4ff) drop-shadow(0 0 12px #e7a4ffbb);stroke-width:6}
+.car-image.mod-turbo-tier-common .turbo-detail{filter:drop-shadow(0 0 4px #71f5d5)}
+.car-image.mod-turbo-tier-rare .turbo-detail{filter:drop-shadow(0 0 5px #70caff) drop-shadow(0 0 10px #70caff99)}
+.car-image.mod-turbo-tier-epic .turbo-detail{filter:drop-shadow(0 0 5px #d9a0ff) drop-shadow(0 0 13px #d9a0ffcc)}
+.car-image.mod-tires-tier-common .wheel-race-spokes{filter:drop-shadow(0 0 3px #d9ff68)}
+.car-image.mod-tires-tier-rare .wheel-race-spokes,.car-image.mod-tires-tier-rare .brake-upgrade{filter:drop-shadow(0 0 4px #70caff) drop-shadow(0 0 7px #70caff88)}
+.car-image.mod-tires-tier-epic .wheel-race-spokes,.car-image.mod-tires-tier-epic .brake-upgrade{filter:drop-shadow(0 0 5px #e7a4ff) drop-shadow(0 0 11px #e7a4ffbb)}
+.car-image.mod-ecu-tier-common .ecu-detail{filter:drop-shadow(0 0 3px #d9ff68)}
+.car-image.mod-ecu-tier-rare .ecu-detail{filter:drop-shadow(0 0 5px #70caff) drop-shadow(0 0 9px #70caff99)}
+.car-image.mod-ecu-tier-epic .ecu-detail{filter:drop-shadow(0 0 5px #e7a4ff) drop-shadow(0 0 12px #e7a4ffcc)}
+.case-panel.charging .case-stage:before{border-color:#d9ff68;box-shadow:0 0 18px #d9ff6855,inset 0 0 18px #d9ff6822}
+.case-panel.surge .case-stage:before{border-color:#ff6548;box-shadow:0 0 35px #ff654899,inset 0 0 35px #ff654833}
+.case-panel.surge .case-stage:after{border-color:#ff6548;animation-duration:.65s}
+.case-panel.unlocking .case-image{animation:case-rush-glow .35s ease-in-out infinite alternate;filter:drop-shadow(0 0 25px #d9ff68)}
+.case-panel.unlocking .case-name{color:#d9ff68;text-shadow:0 0 22px #d9ff68cc}
+.case-panel.unlocking .case-floor{background:radial-gradient(ellipse,#d9ff6870,transparent 72%)}
+@media(prefers-reduced-motion:reduce){.case-panel.charging .case-stage:before,.case-panel.surge .case-stage:after,.case-panel.unlocking .case-image{animation:none!important}}
