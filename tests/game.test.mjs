@@ -113,3 +113,32 @@ test('legacy saves migrate progress counters safely and corrupted counters are c
   assert.equal(bad.racesWon, 0);
   assert.equal(bad.upgradesPurchased, 0);
 });
+
+
+test('duplicate compensation never reaches or exceeds the case price', () => {
+  const start = initialState();
+  const rareOnce = openCase(start, 0.7);
+  const rareDuplicate = openCase(rareOnce, 0.7);
+  assert.equal(rareDuplicate.credits, rareOnce.credits - CASE_COST + 160);
+  const epicOnce = openCase(start, 0.95);
+  const epicDuplicate = openCase(epicOnce, 0.95);
+  assert.equal(epicDuplicate.credits, epicOnce.credits - CASE_COST + 220);
+  assert.ok(80 < CASE_COST);
+  assert.ok(160 < CASE_COST);
+  assert.ok(220 < CASE_COST);
+});
+test('opening repeated rare and epic cases cannot create credits from the refund alone', () => {
+  for (const [roll, refund] of [[0.7, 160], [0.95, 220]]) {
+    let state = initialState();
+    state = openCase(state, roll);
+    const before = state.credits;
+    state = openCase(state, roll);
+    assert.equal(state.credits, before - CASE_COST + refund);
+    assert.ok(state.credits < before);
+  }
+});
+test('case rolls immediately below one stay within the epic tier', () => {
+  const result = openCase(initialState(), 0.999999999);
+  assert.equal(result.cars.find(c => c.id === 'phantom').owned, true);
+  assert.equal(result.casesOpened, 1);
+});
